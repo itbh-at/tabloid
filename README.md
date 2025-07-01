@@ -59,7 +59,7 @@ The response will be an octet stream in the format specified by the `Accept` req
 ## 🛠️ Tech Stack
 
 | Purpose              | Tool/Library                            |
-|-||
+|-|-|
 | Framework            | [Quarkus](https://quarkus.io)            |
 | XLSX Generation      | [Apache POI (Quarkus extension)](https://quarkus.io/extensions/io.quarkiverse.poi/quarkus-poi/) |
 | ODS Generation       | [ODF Toolkit](https://odftoolkit.org/)   |
