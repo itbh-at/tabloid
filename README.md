@@ -1,10 +1,10 @@
-# 📄 Tabloid
+# 📄 tabloid - YOUR TABLE DROID
 
-**Tabloid** is a standalone RESTful microservice for transforming structured JSON data into multiple tabular file formats—including XLSX, ODS, CSV, HTML, and PDF/UA.
+**tabloid** is a standalone RESTful microservice for transforming structured JSON data into multiple file formats — including *XLSX, ODS, CSV, HTML, and PDF/UA*.
 
-Built with **Java** and **Quarkus**, Tabloid is designed for simplicity, making it ideal for generating human- and machine-readable reports from structured data.
+<img src="tabloid.png" style="width: 150px"> 
 
----
+Built with **Java** and **Quarkus**, **tabloid** is designed for simplicity, making it ideal for generating human- and machine-readable reports from structured data.
 
 ## 🚀 Features
 
@@ -17,8 +17,6 @@ Built with **Java** and **Quarkus**, Tabloid is designed for simplicity, making 
   - PDF/UA (`application/pdf`)
 - 🧠 **In-memory processing**: Lightweight and fast.
 - 🧱 Built on **Quarkus**, with support from industry-standard libraries.
-
----
 
 ## 📬 API Usage
 
@@ -58,20 +56,16 @@ Accept: [desired MIME type]
 
 The response will be an octet stream in the format specified by the `Accept` request header and a `Content-Disposition` header defining the filename.
 
----
-
 ## 🛠️ Tech Stack
 
 | Purpose              | Tool/Library                            |
-|----------------------|------------------------------------------|
+|-||
 | Framework            | [Quarkus](https://quarkus.io)            |
 | XLSX Generation      | [Apache POI (Quarkus extension)](https://quarkus.io/extensions/io.quarkiverse.poi/quarkus-poi/) |
 | ODS Generation       | [ODF Toolkit](https://odftoolkit.org/)   |
 | CSV Generation       | [Jackson CSV](https://github.com/FasterXML/jackson-dataformats-text) |
 | HTML Rendering       | [Quarkus Qute](https://quarkus.io/guides/qute) |
 | PDF Generation       | [openhtmltopdf](https://github.com/openhtmltopdf/openhtmltopdf) |
-
----
 
 ## 🧪 Development Status
 
@@ -90,8 +84,6 @@ The response will be an octet stream in the format specified by the `Accept` req
 - ❌ CSV/HTML/PDF as input formats.
 - ❌ CLI support.
 
----
-
 ## 📈 Roadmap
 
 - [ ] Add support for streaming I/O
@@ -100,21 +92,14 @@ The response will be an octet stream in the format specified by the `Accept` req
 - [ ] Enable native builds
 - [ ] Expand input format support
 
----
-
 ## 🤝 Contributing
 
 Pull requests and discussions are welcome. Please open an issue for significant changes or new features.
-
----
 
 ## 📝 License
 
 [GPLv3](LICENSE)
 
----
-
 ## 👤 Author
 
 Project maintained by the [ITBH](https://github.com/itbh-at) team.
-
