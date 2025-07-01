@@ -22,13 +22,22 @@ Built with **Java** and **Quarkus**, **tabloid** is designed for simplicity, mak
 
 ### Endpoint
 
-Request:
+Request for a document containing potentially more than one table; e.g. XLSX, ODS, HTML, PDF/UA:
 
 ```
-POST /generate
+POST /tables
 Content-Type: application/json
 Accept: [desired MIME type]
 ```
+
+Request for a document containing exactly one table; e.g. CSV, XLSX, ODS, HTML, PDF/UA:
+
+```
+POST /table
+Content-Type: application/json
+Accept: [desired MIME type]
+```
+
 
 ### Request Body (Example)
 
