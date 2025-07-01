@@ -90,7 +90,7 @@ The response will be an octet stream in the format specified by the `Accept` req
 - [ ] Implement CLI mode
 - [ ] Add metadata (e.g., filename) in top-level JSON
 - [ ] Enable native builds
-- [ ] Expand input format support
+- [ ] Expand input format support; e.g. Markdown, AsciiDoc
 
 ## 🤝 Contributing
 
