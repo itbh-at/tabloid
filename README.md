@@ -112,4 +112,4 @@ Pull requests and discussions are welcome. Please open an issue for significant 
 
 ## 👤 Author
 
-Project maintained by the [ITBH](https://github.com/itbh-at) team.
+Project maintained by the [ITBH](https://github.com/itbh-at) team and friends.
