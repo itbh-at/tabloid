@@ -1,0 +1,68 @@
+{
+    "document": {
+        "title": "test",
+        "author": "ITBH",
+        "subject": null,
+        "keywords": [],
+        "locale": "de-AT",
+        "formats": [
+            {
+                "format": "csv",
+                "charset": "CP1252",
+                "delimiter": ";",
+                "alwaysQuoteEmptyStrings": true,
+                "alwaysQuoteStrings": false,
+                "escapeControlCharsWithEscapeChar": null,
+                "escapeQuoteCharWithEscapeChar": null,
+                "omitMissingTailColumns": true,
+                "includeHeader": true
+            },
+            {
+                "format": "pdf",
+                "version": 2.0,
+                "size": "279mm 432mm"
+            },
+            {
+                "format": "xlsx",
+                "freezeHeaderRow": true,
+                "freezeHeaderColumn": false,
+                "hasHeaderColumn": false,
+                "hasFooterColumn": false,
+                "hasFooterRow": false,
+                "tables": {
+                    "Table 1": {
+                        "freezeHeaderRow": false,
+                        "freezeHeaderColumn": true,
+                        "hasFooterRow": true
+                    }
+                }
+            }
+        ]
+    },
+    "tables": [
+        {
+            "name": "Table 1",
+            "columns": [
+                {
+                    "name": "Name",
+                    "type": "string"
+                },
+                {
+                    "name": "Age",
+                    "type": "number",
+                    "format": "%.6f"
+                }
+            ],
+            "rows": [
+                [
+                    "Alice",
+                    30
+                ],
+                [
+                    "Bob",
+                    25
+                ]
+            ]
+        }
+    ]
+}
