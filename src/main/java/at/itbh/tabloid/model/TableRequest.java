@@ -3,10 +3,7 @@ package at.itbh.tabloid.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
-public class TableRequest {
-    @JsonProperty("document")
-    public Document document;
-
-    @JsonProperty("tables")
-    public List<Table> tables;
+public record TableRequest(
+        @JsonProperty("document") Document document,
+        @JsonProperty("tables") List<Table> tables) {
 }

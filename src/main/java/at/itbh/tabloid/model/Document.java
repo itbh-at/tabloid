@@ -1,21 +1,14 @@
 package at.itbh.tabloid.model;
 
+import at.itbh.tabloid.model.format.FormatOptions;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
-public class Document {
-    @JsonProperty("title")
-    public String title;
-
-    @JsonProperty("author")
-    public String author;
-
-    @JsonProperty("subject")
-    public String subject;
-
-    @JsonProperty("keywords")
-    public List<String> keywords;
-
-    @JsonProperty("locale")
-    public String locale;
+public record Document(
+        @JsonProperty("title") String title,
+        @JsonProperty("author") String author,
+        @JsonProperty("subject") String subject,
+        @JsonProperty("keywords") List<String> keywords,
+        @JsonProperty("locale") String locale,
+        @JsonProperty("formats") List<FormatOptions> formats) {
 }
