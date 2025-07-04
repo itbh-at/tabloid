@@ -1,68 +1,103 @@
 {
     "document": {
-        "title": "test",
-        "author": "ITBH",
-        "subject": null,
-        "keywords": [],
-        "locale": "de-AT",
-        "formats": [
-            {
-                "format": "csv",
-                "charset": "CP1252",
-                "delimiter": ";",
-                "alwaysQuoteEmptyStrings": true,
-                "alwaysQuoteStrings": false,
-                "escapeControlCharsWithEscapeChar": null,
-                "escapeQuoteCharWithEscapeChar": null,
-                "omitMissingTailColumns": true,
-                "includeHeader": true
-            },
-            {
-                "format": "pdf",
-                "version": 2.0,
-                "size": "279mm 432mm"
-            },
-            {
-                "format": "xlsx",
-                "freezeHeaderRow": true,
-                "freezeHeaderColumn": false,
-                "hasHeaderColumn": false,
-                "hasFooterColumn": false,
-                "hasFooterRow": false,
-                "tables": {
-                    "Table 1": {
-                        "freezeHeaderRow": false,
-                        "freezeHeaderColumn": true,
-                        "hasFooterRow": true
-                    }
-                }
+      "title": "test",
+      "author": "ITBH",
+      "subject": null,
+      "keywords": [],
+      "locale": "de-AT",
+      "timezone": "Europe/Vienna",
+      "formats": [
+        {
+          "format": "csv",
+          "charset": "CP1252",
+          "delimiter": ";",
+          "alwaysQuoteEmptyStrings": true,
+          "alwaysQuoteStrings": false,
+          "escapeControlCharsWithEscapeChar": null,
+          "escapeQuoteCharWithEscapeChar": null,
+          "omitMissingTailColumns": true,
+          "includeHeader": true
+        },
+        {
+          "format": "pdf",
+          "version": 2.0,
+          "size": "279mm 432mm"
+        },
+        {
+          "format": "xlsx",
+          "freezeHeaderRow": true,
+          "freezeHeaderColumn": false,
+          "hasHeaderColumn": false,
+          "hasFooterColumn": false,
+          "hasFooterRow": false,
+          "tables": {
+            "Table 1": {
+              "freezeHeaderRow": false,
+              "freezeHeaderColumn": true,
+              "hasFooterRow": true
             }
-        ]
+          }
+        }
+      ]
     },
     "tables": [
-        {
-            "name": "Table 1",
-            "columns": [
-                {
-                    "name": "Name",
-                    "type": "string"
-                },
-                {
-                    "name": "Age",
-                    "type": "number",
-                    "format": "%.6f"
-                }
-            ],
-            "rows": [
-                [
-                    "Alice",
-                    30
-                ],
-                [
-                    "Bob",
-                    25
-                ]
-            ]
-        }
+      {
+        "name": "Table 1",
+        "columns": [
+          {
+            "name": "Name",
+            "type": "string"
+          },
+          {
+            "name": "Age",
+            "type": "number",
+            "format": "%.6f"
+          },
+          {
+            "name": "Income",
+            "type": "currency",
+            "symbol": "€",
+            "format": "%.2f"
+          },
+          {
+            "name": "Birthday",
+            "type": "date"
+          },
+          {
+            "name": "Inserted",
+            "type": "timestamp"
+          }
+        ],
+        "rows": [
+          [
+            "Alice",
+            30,
+            1234.56,
+            "1993-01-01",
+            "2025-07-01T10:18:39Z"
+          ],
+          [
+            "Bob",
+            25,
+            300,
+            "1998-05-23",
+            "2025-07-01T10:18:39+0200"
+          ],
+          [
+            "Cara",
+            40,
+            10300.123456,
+            "1983-09-12",
+            "2025-07-01T10:18:39+0000"
+          ],
+          [
+            null,
+            null,
+            11834.683456,
+            null,
+            null
+          ]
+        ]
+      }
     ]
-}
+  }
