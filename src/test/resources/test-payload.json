@@ -14,7 +14,14 @@
     "formats": [
       {
         "format": "xlsx",
-        "freezeHeaderRow": true
+        "freezeHeaderRow": true,
+        "freezeHeaderColumn": false,
+        "tables": {
+          "Regional Sales Performance": {
+            "freezeHeaderRow": true,
+            "freezeHeaderColumn": true
+          }
+        }
       }
     ]
   },

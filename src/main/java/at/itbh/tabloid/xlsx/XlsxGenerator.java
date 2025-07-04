@@ -2,7 +2,10 @@ package at.itbh.tabloid.xlsx;
 
 import at.itbh.tabloid.model.Column;
 import at.itbh.tabloid.model.Document;
+import at.itbh.tabloid.model.Table;
 import at.itbh.tabloid.model.TabloidRequest;
+import at.itbh.tabloid.model.format.XlsxFormatOptions;
+import at.itbh.tabloid.model.format.XlsxTableOptions;
 import jakarta.enterprise.context.ApplicationScoped;
 import org.apache.poi.ooxml.POIXMLProperties;
 import org.apache.poi.ss.usermodel.*;
@@ -46,8 +49,15 @@ public class XlsxGenerator {
             setDocumentProperties(request.document(), workbook);
             Map<String, CellStyle> styleCache = new HashMap<>();
 
+            final XlsxFormatOptions xlsxOptions = request.document().formats().stream()
+                    .filter(XlsxFormatOptions.class::isInstance)
+                    .map(XlsxFormatOptions.class::cast)
+                    .findFirst()
+                    .orElse(null);
+
             request.tables().forEach(table -> {
                 Sheet sheet = workbook.createSheet(table.name());
+                applyFreezePanes(sheet, table, xlsxOptions);
                 Row headerRow = sheet.createRow(0);
                 for (int i = 0; i < table.columns().size(); i++) {
                     headerRow.createCell(i).setCellValue(table.columns().get(i).name());
@@ -67,6 +77,27 @@ public class XlsxGenerator {
     }
 
     /**
+     * Applies freeze panes to a sheet based on global and table-specific options.
+     */
+    private void applyFreezePanes(Sheet sheet, Table table, XlsxFormatOptions globalOptions) {
+        if (globalOptions == null) {
+            return;
+        }
+        boolean freezeRow = globalOptions.freezeHeaderRow();
+        boolean freezeCol = globalOptions.freezeHeaderColumn();
+        XlsxTableOptions tableOptions = globalOptions.tables().get(table.name());
+        if (tableOptions != null) {
+            freezeRow = tableOptions.freezeHeaderRow();
+            freezeCol = tableOptions.freezeHeaderColumn();
+        }
+        int colSplit = freezeCol ? 1 : 0;
+        int rowSplit = freezeRow ? 1 : 0;
+        if (colSplit > 0 || rowSplit > 0) {
+            sheet.createFreezePane(colSplit, rowSplit);
+        }
+    }
+
+    /**
      * Creates a cell and populates it based on the column's data type.
      */
     private void createCell(XSSFWorkbook workbook, Row row, int colIndex, Object value, Column column,
@@ -81,12 +112,9 @@ public class XlsxGenerator {
             case "currency":
                 cell.setCellValue(Double.parseDouble(value.toString()));
                 String numberFormat = column.format();
-                // Only apply a style if a format string is provided in the JSON
                 if (numberFormat != null && !numberFormat.isBlank()) {
-                    // Check the cache for an existing style
                     CellStyle numberStyle = styleCache.get(numberFormat);
                     if (numberStyle == null) {
-                        // If not in cache, create it and add it
                         numberStyle = workbook.createCellStyle();
                         numberStyle
                                 .setDataFormat(workbook.getCreationHelper().createDataFormat().getFormat(numberFormat));
@@ -97,7 +125,6 @@ public class XlsxGenerator {
                 break;
             case "date":
                 cell.setCellValue(LocalDate.parse(value.toString()));
-                // Use a standard date format
                 String dateFormat = "yyyy-mm-dd";
                 CellStyle dateStyle = styleCache.get(dateFormat);
                 if (dateStyle == null) {
@@ -110,7 +137,6 @@ public class XlsxGenerator {
             case "timestamp":
                 cell.setCellValue(
                         Date.from(ZonedDateTime.parse(value.toString(), FLEXIBLE_TIMESTAMP_FORMATTER).toInstant()));
-                // Use a standard timestamp format
                 String tsFormat = "yyyy-mm-dd hh:mm:ss";
                 CellStyle tsStyle = styleCache.get(tsFormat);
                 if (tsStyle == null) {
