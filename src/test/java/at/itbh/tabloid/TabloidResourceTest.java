@@ -11,7 +11,7 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.is;
 
 @QuarkusTest
-public class TableResourceTest {
+public class TabloidResourceTest {
 
     @Test
     public void testFullJsonDeserialization() throws Exception {
