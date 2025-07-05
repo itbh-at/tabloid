@@ -1,0 +1,95 @@
+{
+  "document": {
+    "title": "Q3 2025 Sales Report",
+    "author": "ITBH",
+    "subject": "Sales figures for the third quarter",
+    "keywords": [
+      "sales",
+      "Q3",
+      "2025",
+      "report"
+    ],
+    "locale": "de-AT",
+    "timezone": "Europe/Vienna",
+    "formats": [
+      {
+        "format": "xlsx",
+        "freezeHeaderRow": true,
+        "freezeHeaderColumn": false,
+        "tables": {
+          "Regional Sales Performance": {
+            "freezeHeaderRow": true,
+            "freezeHeaderColumn": true
+          }
+        }
+      }
+    ]
+  },
+  "tables": [
+    {
+      "name": "Regional Sales Performance",
+      "columns": [
+        {
+          "name": "Region",
+          "type": "string"
+        },
+        {
+          "name": "Units Sold",
+          "type": "number",
+          "format": "#,##0"
+        },
+        {
+          "name": "Total Revenue",
+          "type": "currency",
+          "symbol": "€",
+          "format": "€ #,##0.00"
+        },
+        {
+          "name": "Last Sale Date",
+          "type": "date"
+        },
+        {
+          "name": "Updated At",
+          "type": "timestamp"
+        }
+      ],
+      "rows": [
+        [
+          "North",
+          5430,
+          123456.78,
+          "2025-09-30",
+          "2025-10-01T10:18:39Z"
+        ],
+        [
+          "East",
+          4890,
+          99870.50,
+          "2025-09-28",
+          "2025-10-01T08:20:15+0000"
+        ],
+        [
+          "South",
+          6120,
+          145987.10,
+          "2025-09-30",
+          "2025-10-01T11:05:00+0200"
+        ],
+        [
+          "West",
+          3570,
+          85640.00,
+          "2025-09-29",
+          "2025-10-01T09:00:00Z"
+        ],
+        [
+          "Central",
+          null,
+          null,
+          null,
+          null
+        ]
+      ]
+    }
+  ]
+}
