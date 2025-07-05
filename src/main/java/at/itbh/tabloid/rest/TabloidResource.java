@@ -10,8 +10,6 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
-import java.io.IOException;
-
 @Path("/tables")
 public class TabloidResource {
 
@@ -26,7 +24,7 @@ public class TabloidResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-    public Response createXlsx(TabloidRequest request) throws IOException {
+    public Response createXlsx(TabloidRequest request) throws Exception {
         byte[] xlsx = xlsxGenerator.generate(request);
         String filename = request.document().title() + ".xlsx";
         return Response.ok(xlsx)
@@ -37,7 +35,7 @@ public class TabloidResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces("application/vnd.oasis.opendocument.spreadsheet")
-    public Response createOds(TabloidRequest request) throws IOException {
+    public Response createOds(TabloidRequest request) throws Exception {
         byte[] ods = odsGenerator.generate(request);
         String filename = request.document().title() + ".ods";
         return Response.ok(ods)

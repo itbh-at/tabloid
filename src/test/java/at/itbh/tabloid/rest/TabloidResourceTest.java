@@ -10,10 +10,14 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.jupiter.api.Test;
 
+import org.odftoolkit.odfdom.doc.OdfSpreadsheetDocument;
+import org.odftoolkit.odfdom.doc.table.OdfTable;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.*;
@@ -61,6 +65,40 @@ public class TabloidResourceTest {
                 assertTrue(sheet1.getColumnWidth(longHeaderColumnIndex) > (8 * 256),
                         "Column with long header should be auto-sized.");
             }
+        }
+    }
+
+    @Test
+    public void testOdsGeneration() throws Exception {
+        String json = new String(
+                TabloidResourceTest.class.getResourceAsStream("/test-payload.json").readAllBytes(),
+                StandardCharsets.UTF_8);
+
+        byte[] fileBytes = given()
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept("application/vnd.oasis.opendocument.spreadsheet")
+                .body(json)
+                .when().post("/tables")
+                .then()
+                .statusCode(200)
+                .header("Content-Type", "application/vnd.oasis.opendocument.spreadsheet")
+                .extract().asByteArray();
+
+        assertNotNull(fileBytes, "The returned file bytes should not be null.");
+        assertTrue(fileBytes.length > 0, "The returned file should not be empty.");
+
+        try (var doc = OdfSpreadsheetDocument.loadDocument(new ByteArrayInputStream(fileBytes))) {
+            List<OdfTable> tables = doc.getTableList(false);
+            assertEquals(1, tables.size(), "Workbook should have one sheet.");
+
+            OdfTable sheet1 = tables.stream()
+                    .filter(table -> "Regional Sales Performance".equals(table.getTableName()))
+                    .findFirst()
+                    .orElse(null);
+
+            assertNotNull(sheet1, "Sheet 'Regional Sales Performance' should exist.");
+            assertEquals("Units Sold", sheet1.getCellByPosition(1, 0).getStringValue(), "Header cell should match.");
+            assertEquals("North", sheet1.getCellByPosition(0, 1).getStringValue(), "Data cell should match.");
         }
     }
 }

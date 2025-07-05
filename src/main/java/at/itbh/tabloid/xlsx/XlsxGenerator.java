@@ -41,7 +41,7 @@ public class XlsxGenerator {
         this.xlsxConfig = xlsxConfig;
     }
 
-    public byte[] generate(TabloidRequest request) throws IOException {
+    public byte[] generate(TabloidRequest request) throws Exception {
         try (XSSFWorkbook workbook = new XSSFWorkbook();
                 ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
 
