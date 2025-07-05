@@ -12,18 +12,14 @@ import jakarta.ws.rs.core.Response;
 
 import java.io.IOException;
 
-@Path("/")
+@Path("/tables")
 public class TabloidResource {
 
     @Inject
     XlsxGenerator xlsxGenerator;
 
-    @POST
-    @Path("/table")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public TabloidRequest unmarshal(TabloidRequest tabloidRequest) {
-        return tabloidRequest;
+    public TabloidResource(XlsxGenerator xlsxGenerator) {
+        this.xlsxGenerator = xlsxGenerator;
     }
 
     /**
@@ -34,14 +30,13 @@ public class TabloidResource {
      * @throws IOException if the file generation fails.
      */
     @POST
-    @Path("/table")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-    public Response generateXlsx(TabloidRequest request) throws IOException {
+    public Response createXlsx(TabloidRequest request) throws IOException {
         byte[] xlsx = xlsxGenerator.generate(request);
-
+        String filename = request.document().title() + ".xlsx";
         return Response.ok(xlsx)
-                .header("Content-Disposition", "attachment; filename=\"" + request.document().title() + ".xlsx\"")
+                .header("Content-Disposition", "attachment; filename=\"" + filename + ".xlsx\"")
                 .build();
     }
 }
