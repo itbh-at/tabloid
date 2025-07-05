@@ -1,8 +1,8 @@
 package at.itbh.tabloid.rest;
 
 import at.itbh.tabloid.model.TabloidRequest;
+import at.itbh.tabloid.ods.OdsGenerator;
 import at.itbh.tabloid.xlsx.XlsxGenerator;
-import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
@@ -15,20 +15,14 @@ import java.io.IOException;
 @Path("/tables")
 public class TabloidResource {
 
-    @Inject
-    XlsxGenerator xlsxGenerator;
+    private final XlsxGenerator xlsxGenerator;
+    private final OdsGenerator odsGenerator;
 
-    public TabloidResource(XlsxGenerator xlsxGenerator) {
+    public TabloidResource(XlsxGenerator xlsxGenerator, OdsGenerator odsGenerator) {
         this.xlsxGenerator = xlsxGenerator;
+        this.odsGenerator = odsGenerator;
     }
 
-    /**
-     * Handles requests for XLSX file generation.
-     *
-     * @param request The tabloid request payload.
-     * @return A JAX-RS Response containing the XLSX file.
-     * @throws IOException if the file generation fails.
-     */
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
@@ -37,6 +31,17 @@ public class TabloidResource {
         String filename = request.document().title() + ".xlsx";
         return Response.ok(xlsx)
                 .header("Content-Disposition", "attachment; filename=\"" + filename + ".xlsx\"")
+                .build();
+    }
+
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces("application/vnd.oasis.opendocument.spreadsheet")
+    public Response createOds(TabloidRequest request) throws IOException {
+        byte[] ods = odsGenerator.generate(request);
+        String filename = request.document().title() + ".ods";
+        return Response.ok(ods)
+                .header("Content-Disposition", "attachment; filename=\"" + filename + "\"")
                 .build();
     }
 }
