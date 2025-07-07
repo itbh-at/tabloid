@@ -1,6 +1,8 @@
 package at.itbh.tabloid.xlsx;
 
 import at.itbh.tabloid.config.XlsxConfig;
+import at.itbh.tabloid.common.ColumnType;
+import at.itbh.tabloid.common.StyleKey;
 import at.itbh.tabloid.config.StyleConfig;
 import at.itbh.tabloid.model.Column;
 import at.itbh.tabloid.model.Document;
@@ -14,7 +16,6 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -61,7 +62,7 @@ public class XlsxGenerator {
                 for (int i = 0; i < table.columns().size(); i++) {
                     Cell headerCell = headerRow.createCell(i);
                     headerCell.setCellValue(table.columns().get(i).name());
-                    headerCell.setCellStyle(styleCache.get("header")); // Use named style
+                    headerCell.setCellStyle(styleCache.get(StyleKey.HEADER));
                 }
 
                 int rowNum = 1;
@@ -105,54 +106,54 @@ public class XlsxGenerator {
             Map<String, CellStyle> styleCache) {
         Cell cell = row.createCell(colIndex);
         if (value == null) {
-            cell.setCellStyle(styleCache.get("data"));
+            cell.setCellStyle(styleCache.get(StyleKey.DATA));
             return;
         }
 
         switch (column.type()) {
-            case "number":
-            case "currency":
+            case ColumnType.NUMBER:
+            case ColumnType.CURRENCY:
                 cell.setCellValue(Double.parseDouble(value.toString()));
                 String numberFormat = column.format();
                 if (numberFormat != null && !numberFormat.isBlank()) {
                     CellStyle numberStyle = styleCache.computeIfAbsent(numberFormat, k -> {
                         CellStyle newStyle = workbook.createCellStyle();
-                        newStyle.cloneStyleFrom(styleCache.get("data"));
+                        newStyle.cloneStyleFrom(styleCache.get(StyleKey.DATA));
                         newStyle.setDataFormat(workbook.getCreationHelper().createDataFormat().getFormat(k));
                         return newStyle;
                     });
                     cell.setCellStyle(numberStyle);
                 } else {
-                    cell.setCellStyle(styleCache.get("data"));
+                    cell.setCellStyle(styleCache.get(StyleKey.DATA));
                 }
                 break;
-            case "date":
+            case ColumnType.DATE:
                 cell.setCellValue(LocalDate.parse(value.toString()));
                 String dateFormat = "yyyy-mm-dd";
                 CellStyle dateStyle = styleCache.computeIfAbsent(dateFormat, k -> {
                     CellStyle newStyle = workbook.createCellStyle();
-                    newStyle.cloneStyleFrom(styleCache.get("data"));
+                    newStyle.cloneStyleFrom(styleCache.get(StyleKey.DATA));
                     newStyle.setDataFormat(workbook.getCreationHelper().createDataFormat().getFormat(k));
                     return newStyle;
                 });
                 cell.setCellStyle(dateStyle);
                 break;
-            case "timestamp":
+            case ColumnType.TIMESTAMP:
                 cell.setCellValue(
                         Date.from(ZonedDateTime.parse(value.toString(), FLEXIBLE_TIMESTAMP_FORMATTER).toInstant()));
                 String tsFormat = "yyyy-mm-dd hh:mm:ss";
                 CellStyle tsStyle = styleCache.computeIfAbsent(tsFormat, k -> {
                     CellStyle newStyle = workbook.createCellStyle();
-                    newStyle.cloneStyleFrom(styleCache.get("data"));
+                    newStyle.cloneStyleFrom(styleCache.get(StyleKey.DATA));
                     newStyle.setDataFormat(workbook.getCreationHelper().createDataFormat().getFormat(k));
                     return newStyle;
                 });
                 cell.setCellStyle(tsStyle);
                 break;
-            case "string":
+            case ColumnType.STRING:
             default:
                 cell.setCellValue(value.toString());
-                cell.setCellStyle(styleCache.get("data"));
+                cell.setCellStyle(styleCache.get(StyleKey.DATA));
                 break;
         }
     }
@@ -173,8 +174,8 @@ public class XlsxGenerator {
 
     private Map<String, CellStyle> createStyles(Workbook workbook) {
         Map<String, CellStyle> styles = new HashMap<>();
-        styles.put("header", createCellStyle(workbook, xlsxConfig.header()));
-        styles.put("data", createCellStyle(workbook, xlsxConfig.data()));
+        styles.put(StyleKey.HEADER, createCellStyle(workbook, xlsxConfig.header()));
+        styles.put(StyleKey.DATA, createCellStyle(workbook, xlsxConfig.data()));
         return styles;
     }
 
