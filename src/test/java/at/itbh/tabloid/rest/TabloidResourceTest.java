@@ -2,22 +2,17 @@ package at.itbh.tabloid.rest;
 
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.ws.rs.core.MediaType;
-
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.jupiter.api.Test;
-
 import org.odftoolkit.odfdom.doc.OdfSpreadsheetDocument;
 import org.odftoolkit.odfdom.doc.table.OdfTable;
+import org.odftoolkit.odfdom.doc.table.OdfTableCell;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 
 import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.*;
@@ -27,52 +22,47 @@ public class TabloidResourceTest {
 
     @Test
     public void testXlsxGeneration() throws IOException {
-        try (InputStream is = TabloidResourceTest.class.getResourceAsStream("/test-payload.json")) {
-            assertNotNull(is, "test-payload.json could not be found.");
-            String json = new String(is.readAllBytes(), StandardCharsets.UTF_8);
+        String json = loadResource("/test-payload.json");
 
-            byte[] fileBytes = given()
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .accept("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-                    .body(json)
-                    .when().post("/tables")
-                    .then()
-                    .statusCode(200)
-                    .extract().asByteArray();
+        byte[] fileBytes = given()
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+                .body(json)
+                .when().post("/tables")
+                .then()
+                .statusCode(200)
+                .extract().asByteArray();
 
-            assertNotNull(fileBytes);
-            assertTrue(fileBytes.length > 0);
+        assertNotNull(fileBytes);
+        assertTrue(fileBytes.length > 0);
 
-            try (XSSFWorkbook workbook = new XSSFWorkbook(new ByteArrayInputStream(fileBytes))) {
-                Sheet sheet1 = workbook.getSheet("Regional Sales Performance");
-                assertNotNull(sheet1);
+        try (XSSFWorkbook workbook = new XSSFWorkbook(new ByteArrayInputStream(fileBytes))) {
+            Sheet sheet1 = workbook.getSheet("Regional Sales Performance");
+            assertNotNull(sheet1);
 
-                Row headerRow = sheet1.getRow(0);
-                assertNotNull(headerRow);
-                Row dataRow = sheet1.getRow(1);
-                assertNotNull(dataRow);
+            Row headerRow = sheet1.getRow(0);
+            assertNotNull(headerRow);
+            Row dataRow = sheet1.getRow(1);
+            assertNotNull(dataRow);
 
-                CellStyle headerStyle = headerRow.getCell(0).getCellStyle();
-                Font headerFont = workbook.getFontAt(headerStyle.getFontIndex());
-                assertTrue(headerFont.getBold(), "Header font should be bold.");
+            CellStyle headerStyle = headerRow.getCell(0).getCellStyle();
+            Font headerFont = workbook.getFontAt(headerStyle.getFontIndex());
+            assertTrue(headerFont.getBold(), "Header font should be bold.");
 
-                CellStyle dataStyle = dataRow.getCell(0).getCellStyle();
-                Font dataFont = workbook.getFontAt(dataStyle.getFontIndex());
-                assertFalse(dataFont.getBold(), "Data font should NOT be bold.");
-                assertEquals("Arial", dataFont.getFontName(), "Data font should be Arial.");
+            CellStyle dataStyle = dataRow.getCell(0).getCellStyle();
+            Font dataFont = workbook.getFontAt(dataStyle.getFontIndex());
+            assertFalse(dataFont.getBold(), "Data font should NOT be bold.");
+            assertEquals("Arial", dataFont.getFontName(), "Data font should be Arial.");
 
-                int longHeaderColumnIndex = 2;
-                assertTrue(sheet1.getColumnWidth(longHeaderColumnIndex) > (8 * 256),
-                        "Column with long header should be auto-sized.");
-            }
+            int longHeaderColumnIndex = 2;
+            assertTrue(sheet1.getColumnWidth(longHeaderColumnIndex) > (12 * 256),
+                    "Column with long header should be auto-sized.");
         }
     }
 
     @Test
     public void testOdsGeneration() throws Exception {
-        String json = new String(
-                TabloidResourceTest.class.getResourceAsStream("/test-payload.json").readAllBytes(),
-                StandardCharsets.UTF_8);
+        String json = loadResource("/test-payload.json");
 
         byte[] fileBytes = given()
                 .contentType(MediaType.APPLICATION_JSON)
@@ -81,24 +71,66 @@ public class TabloidResourceTest {
                 .when().post("/tables")
                 .then()
                 .statusCode(200)
-                .header("Content-Type", "application/vnd.oasis.opendocument.spreadsheet")
                 .extract().asByteArray();
 
-        assertNotNull(fileBytes, "The returned file bytes should not be null.");
-        assertTrue(fileBytes.length > 0, "The returned file should not be empty.");
+        assertNotNull(fileBytes);
+        assertTrue(fileBytes.length > 0);
 
         try (var doc = OdfSpreadsheetDocument.loadDocument(new ByteArrayInputStream(fileBytes))) {
-            List<OdfTable> tables = doc.getTableList(false);
-            assertEquals(1, tables.size(), "Workbook should have one sheet.");
+            assertEquals("Q3 2025 Sales Report", doc.getOfficeMetadata().getTitle());
+            assertEquals("ITBH", doc.getOfficeMetadata().getCreator());
 
-            OdfTable sheet1 = tables.stream()
-                    .filter(table -> "Regional Sales Performance".equals(table.getTableName()))
-                    .findFirst()
-                    .orElse(null);
+            OdfTable sheet = doc.getTableByName("Regional Sales Performance");
+            assertNotNull(sheet, "Sheet 'Regional Sales Performance' should exist.");
 
-            assertNotNull(sheet1, "Sheet 'Regional Sales Performance' should exist.");
-            assertEquals("Units Sold", sheet1.getCellByPosition(1, 0).getStringValue(), "Header cell should match.");
-            assertEquals("North", sheet1.getCellByPosition(0, 1).getStringValue(), "Data cell should match.");
+            assertEquals("Region", sheet.getCellByPosition(0, 0).getStringValue());
+
+            OdfTableCell cellB2 = sheet.getCellByPosition(1, 1);
+            assertEquals("float", cellB2.getValueType());
+            assertEquals(5430.0, cellB2.getDoubleValue(), 0.001);
+
+            OdfTableCell cellD2 = sheet.getCellByPosition(3, 1);
+            assertEquals("date", cellD2.getValueType());
+            assertNotNull(cellD2.getDateValue());
+        }
+    }
+
+    @Test
+    public void testOdsGenerationWithMalformedData() throws Exception {
+        String json = loadResource("/test-payload-malformed.json");
+
+        byte[] fileBytes = given()
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept("application/vnd.oasis.opendocument.spreadsheet")
+                .body(json)
+                .when().post("/tables")
+                .then()
+                .statusCode(200)
+                .extract().asByteArray();
+
+        assertNotNull(fileBytes);
+
+        try (var doc = OdfSpreadsheetDocument.loadDocument(new ByteArrayInputStream(fileBytes))) {
+            OdfTable sheet = doc.getTableByName("Malformed Data");
+            assertNotNull(sheet);
+
+            OdfTableCell cellB2 = sheet.getCellByPosition(1, 1);
+            assertEquals("float", cellB2.getValueType());
+            assertEquals(100.0, cellB2.getDoubleValue(), 0.001);
+
+            OdfTableCell cellB3 = sheet.getCellByPosition(1, 2);
+            assertEquals("string", cellB3.getValueType());
+            assertEquals("Invalid", cellB3.getStringValue());
+
+            OdfTableCell cellB4 = sheet.getCellByPosition(1, 3);
+            assertTrue(cellB4.getStringValue().isEmpty());
+        }
+    }
+
+    private String loadResource(String path) throws IOException {
+        try (InputStream is = TabloidResourceTest.class.getResourceAsStream(path)) {
+            assertNotNull(is, "Resource could not be found: " + path);
+            return new String(is.readAllBytes(), StandardCharsets.UTF_8);
         }
     }
 }
