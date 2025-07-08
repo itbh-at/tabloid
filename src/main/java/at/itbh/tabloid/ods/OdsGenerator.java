@@ -5,11 +5,14 @@ import at.itbh.tabloid.config.FontConfig;
 import at.itbh.tabloid.config.OdsConfig;
 import at.itbh.tabloid.config.StyleConfig;
 import at.itbh.tabloid.model.Column;
+import at.itbh.tabloid.model.Table;
 import at.itbh.tabloid.model.TabloidRequest;
+import at.itbh.tabloid.util.ColumnWidthHeuristic;
 import jakarta.enterprise.context.ApplicationScoped;
 import org.odftoolkit.odfdom.doc.OdfSpreadsheetDocument;
 import org.odftoolkit.odfdom.doc.table.OdfTable;
 import org.odftoolkit.odfdom.doc.table.OdfTableCell;
+import org.odftoolkit.odfdom.doc.table.OdfTableColumn;
 import org.odftoolkit.odfdom.dom.OdfDocumentNamespace;
 import org.odftoolkit.odfdom.dom.element.style.StyleTextPropertiesElement;
 import org.odftoolkit.odfdom.dom.style.OdfStyleFamily;
@@ -22,6 +25,7 @@ import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -65,6 +69,16 @@ public class OdsGenerator {
                     sheet.setTableName(tableData.name());
                 }
 
+                List<Integer> maxWidths = new ArrayList<>();
+                for (int colIndex = 0; colIndex < tableData.columns().size(); colIndex++) {
+                    maxWidths.add(findMaxColumnWidth(tableData, colIndex));
+                }
+                for (int colIndex = 0; colIndex < tableData.columns().size(); colIndex++) {
+                    OdfTableColumn column = sheet.getColumnByIndex(colIndex);
+                    long width = maxWidths.get(colIndex);
+                    column.setWidth(width);
+                }
+
                 for (int colIndex = 0; colIndex < tableData.columns().size(); colIndex++) {
                     OdfTableCell cell = sheet.getCellByPosition(colIndex, 0);
                     cell.setStringValue(tableData.columns().get(colIndex).name());
@@ -89,6 +103,23 @@ public class OdsGenerator {
             doc.save(out);
             return out.toByteArray();
         }
+    }
+
+    private int findMaxColumnWidth(Table tableData, int colIndex) {
+        String headerName = tableData.columns().get(colIndex).name();
+        int maxWidth = ColumnWidthHeuristic.calculateWidth(headerName);
+        for (List<Object> rowData : tableData.rows()) {
+            if (colIndex < rowData.size()) {
+                Object cellValue = rowData.get(colIndex);
+                if (cellValue != null) {
+                    int cellWidth = ColumnWidthHeuristic.calculateWidth(cellValue.toString());
+                    if (cellWidth > maxWidth) {
+                        maxWidth = cellWidth;
+                    }
+                }
+            }
+        }
+        return maxWidth;
     }
 
     private void createNamedStyles(OdfSpreadsheetDocument doc) throws Exception {

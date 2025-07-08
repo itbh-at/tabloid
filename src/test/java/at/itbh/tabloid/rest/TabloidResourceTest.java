@@ -8,6 +8,9 @@ import org.junit.jupiter.api.Test;
 import org.odftoolkit.odfdom.doc.OdfSpreadsheetDocument;
 import org.odftoolkit.odfdom.doc.table.OdfTable;
 import org.odftoolkit.odfdom.doc.table.OdfTableCell;
+import org.odftoolkit.odfdom.doc.table.OdfTableColumn;
+
+import at.itbh.tabloid.util.ColumnWidthHeuristic;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -92,6 +95,34 @@ public class TabloidResourceTest {
             OdfTableCell cellD2 = sheet.getCellByPosition(3, 1);
             assertEquals("date", cellD2.getValueType());
             assertNotNull(cellD2.getDateValue());
+        }
+    }
+
+    @Test
+    public void testOdsColumnWidthHeuristic() throws Exception {
+        String json = loadResource("/test-payload.json");
+
+        byte[] fileBytes = given()
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept("application/vnd.oasis.opendocument.spreadsheet")
+                .body(json)
+                .when().post("/tables")
+                .then()
+                .statusCode(200)
+                .extract().asByteArray();
+
+        try (var doc = OdfSpreadsheetDocument.loadDocument(new ByteArrayInputStream(fileBytes))) {
+            OdfTable sheet = doc.getTableByName("Regional Sales Performance");
+            assertNotNull(sheet);
+
+            // The longest text overall is in the "Updated At" column:
+            // "2025-10-01T11:05:00+0200" (25 chars)
+            int expectedWidth = ColumnWidthHeuristic.calculateWidth("2025-10-01T11:05:00+0200");
+
+            OdfTableColumn updatedAtColumn = sheet.getColumnByIndex(4);
+            assertNotNull(updatedAtColumn);
+
+            assertEquals(expectedWidth, updatedAtColumn.getWidth());
         }
     }
 
