@@ -127,6 +127,28 @@ public class TabloidResourceTest {
     }
 
     @Test
+    public void testCsvGeneration() throws Exception {
+        String json = loadResource("/test-payload.json");
+
+        String csvOutput = given()
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept("text/csv")
+                .body(json)
+                .when().post("/tables")
+                .then()
+                .statusCode(200)
+                .extract().asString();
+
+        assertNotNull(csvOutput);
+
+        String[] lines = csvOutput.split("\\R");
+        assertEquals(6, lines.length, "Should be 6 lines: 1 header + 5 data rows");
+        assertEquals("\"Region\",\"Units Sold\",\"Total Revenue\",\"Last Sale Date\",\"Updated At\"", lines[0]);
+        assertEquals("\"North\",5430,123456.78,\"2025-09-30\",\"2025-10-01T10:18:39Z\"", lines[1]);
+        assertEquals("\"Central\",\"\",\"\",\"\",\"\"", lines[5]);
+    }
+
+    @Test
     public void testOdsGenerationWithMalformedData() throws Exception {
         String json = loadResource("/test-payload-malformed.json");
 

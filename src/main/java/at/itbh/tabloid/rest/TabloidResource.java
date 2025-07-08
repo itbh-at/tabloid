@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import at.itbh.tabloid.csv.CsvGenerator;
 import at.itbh.tabloid.model.TabloidRequest;
 import at.itbh.tabloid.ods.OdsGenerator;
 import at.itbh.tabloid.xlsx.XlsxGenerator;
@@ -19,11 +20,14 @@ public class TabloidResource {
 
     private final XlsxGenerator xlsxGenerator;
     private final OdsGenerator odsGenerator;
+    private final CsvGenerator csvGenerator;
     private final ObjectMapper objectMapper;
 
-    public TabloidResource(XlsxGenerator xlsxGenerator, OdsGenerator odsGenerator, ObjectMapper objectMapper) {
+    public TabloidResource(XlsxGenerator xlsxGenerator, OdsGenerator odsGenerator, CsvGenerator csvGenerator,
+            ObjectMapper objectMapper) {
         this.xlsxGenerator = xlsxGenerator;
         this.odsGenerator = odsGenerator;
+        this.csvGenerator = csvGenerator;
         this.objectMapper = objectMapper;
     }
 
@@ -72,6 +76,19 @@ public class TabloidResource {
             byte[] ods = odsGenerator.generate(request);
             String filename = request.document().title() + ".ods";
             return Response.ok(ods)
+                    .header("Content-Disposition", "attachment; filename=\"" + filename + "\"")
+                    .build();
+        });
+    }
+
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces("text/csv")
+    public Response createCsv(JsonNode requestNode) throws Exception {
+        return processRequest(requestNode, (request) -> {
+            byte[] csv = csvGenerator.generate(request);
+            String filename = request.document().title() + ".csv";
+            return Response.ok(csv)
                     .header("Content-Disposition", "attachment; filename=\"" + filename + "\"")
                     .build();
         });
