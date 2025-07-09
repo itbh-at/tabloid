@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import at.itbh.tabloid.csv.CsvGenerator;
+import at.itbh.tabloid.html.HtmlGenerator;
 import at.itbh.tabloid.model.TabloidRequest;
 import at.itbh.tabloid.ods.OdsGenerator;
 import at.itbh.tabloid.xlsx.XlsxGenerator;
@@ -21,13 +22,15 @@ public class TabloidResource {
     private final XlsxGenerator xlsxGenerator;
     private final OdsGenerator odsGenerator;
     private final CsvGenerator csvGenerator;
+    private final HtmlGenerator htmlGenerator;
     private final ObjectMapper objectMapper;
 
     public TabloidResource(XlsxGenerator xlsxGenerator, OdsGenerator odsGenerator, CsvGenerator csvGenerator,
-            ObjectMapper objectMapper) {
+            HtmlGenerator htmlGenerator, ObjectMapper objectMapper) {
         this.xlsxGenerator = xlsxGenerator;
         this.odsGenerator = odsGenerator;
         this.csvGenerator = csvGenerator;
+        this.htmlGenerator = htmlGenerator;
         this.objectMapper = objectMapper;
     }
 
@@ -89,6 +92,19 @@ public class TabloidResource {
             byte[] csv = csvGenerator.generate(request);
             String filename = request.document().title() + ".csv";
             return Response.ok(csv)
+                    .header("Content-Disposition", "attachment; filename=\"" + filename + "\"")
+                    .build();
+        });
+    }
+
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.TEXT_HTML)
+    public Response createHtml(JsonNode requestNode) throws Exception {
+        return processRequest(requestNode, (request) -> {
+            String html = htmlGenerator.generate(request);
+            String filename = request.document().title() + ".html";
+            return Response.ok(html)
                     .header("Content-Disposition", "attachment; filename=\"" + filename + "\"")
                     .build();
         });

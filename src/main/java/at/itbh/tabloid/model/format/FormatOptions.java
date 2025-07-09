@@ -7,9 +7,10 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "format")
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = CsvFormatOptions.class, name = "csv"),
-        @JsonSubTypes.Type(value = XlsxFormatOptions.class, name = "xlsx"),
-        @JsonSubTypes.Type(value = PdfFormatOptions.class, name = "pdf")
+                @JsonSubTypes.Type(value = CsvFormatOptions.class, name = "csv"),
+                @JsonSubTypes.Type(value = XlsxFormatOptions.class, name = "xlsx"),
+                @JsonSubTypes.Type(value = PdfFormatOptions.class, name = "pdf"),
+                @JsonSubTypes.Type(value = HtmlFormatOptions.class, name = "html")
 })
-public sealed interface FormatOptions permits CsvFormatOptions, PdfFormatOptions, XlsxFormatOptions {
+public sealed interface FormatOptions permits CsvFormatOptions, PdfFormatOptions, XlsxFormatOptions, HtmlFormatOptions {
 }

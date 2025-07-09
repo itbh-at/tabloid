@@ -4,6 +4,7 @@ import io.quarkus.test.junit.QuarkusTest;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import static org.hamcrest.Matchers.containsString;
 import org.junit.jupiter.api.Test;
 import org.odftoolkit.odfdom.doc.OdfSpreadsheetDocument;
 import org.odftoolkit.odfdom.doc.table.OdfTable;
@@ -178,6 +179,45 @@ public class TabloidResourceTest {
             OdfTableCell cellB4 = sheet.getCellByPosition(1, 3);
             assertTrue(cellB4.getStringValue().isEmpty());
         }
+    }
+
+    @Test
+    public void testHtmlGeneration() throws IOException {
+        String json = loadResource("/test-payload.json");
+
+        given()
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.TEXT_HTML) // Request HTML output
+                .body(json)
+                .when().post("/tables")
+                .then()
+                .statusCode(200)
+                .header("Content-Type", containsString(MediaType.TEXT_HTML))
+                .header("Content-Disposition", "attachment; filename=\"Q3 2025 Sales Report.html\"")
+                .body(
+                        containsString("<!DOCTYPE html>"),
+                        containsString("<h1>Q3 2025 Sales Report</h1>"),
+                        containsString("<h2>Regional Sales Performance</h2>"),
+                        containsString("<td>North</td>"),
+                        containsString("<td>123456.78</td>"));
+    }
+
+    @Test
+    public void testHtmlGenerationWithCustomCss() throws IOException {
+        String json = loadResource("/test-payload-custom-css.json");
+
+        given()
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.TEXT_HTML)
+                .body(json)
+                .when().post("/tables")
+                .then()
+                .statusCode(200)
+                .body(
+                        containsString("<h1>Custom CSS Report</h1>"),
+                        containsString("color: green;"),
+                        containsString("border: 5px dashed blue;"),
+                        containsString("background-color: orange;"));
     }
 
     private String loadResource(String path) throws IOException {

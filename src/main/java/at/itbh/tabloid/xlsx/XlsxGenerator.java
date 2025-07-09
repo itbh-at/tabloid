@@ -49,10 +49,7 @@ public class XlsxGenerator {
             setDocumentProperties(request.document(), workbook);
             Map<String, CellStyle> styleCache = createStyles(workbook);
 
-            final XlsxFormatOptions xlsxOptions = request.document().formats().stream()
-                    .filter(XlsxFormatOptions.class::isInstance)
-                    .map(XlsxFormatOptions.class::cast)
-                    .findFirst()
+            final XlsxFormatOptions xlsxOptions = request.getFormatOptions(XlsxFormatOptions.class)
                     .orElse(null);
 
             for (Table table : request.tables()) {

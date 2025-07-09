@@ -40,10 +40,7 @@ public class CsvGenerator {
 
         var table = request.tables().get(0);
 
-        final CsvFormatOptions csvOptions = request.document().formats().stream()
-                .filter(CsvFormatOptions.class::isInstance)
-                .map(CsvFormatOptions.class::cast)
-                .findFirst()
+        final CsvFormatOptions csvOptions = request.getFormatOptions(CsvFormatOptions.class)
                 .orElse(new CsvFormatOptions(null, null, null, null, null, null, null, null, null));
 
         CsvMapper mapper = createConfiguredMapper(csvOptions);

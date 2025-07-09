@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="{#if request.document.locale}{request.document.locale.substring(0, 2)}{#else}en{/if}">
+<head>
+    <meta charset="UTF-8">
+    <title>{request.document.title}</title>
+    {#if cssContent}
+    <style>
+        {cssContent}
+    </style>
+    {#else if cssPath}
+    <link rel="stylesheet" href="{cssPath}">
+    {/if}
+</head>
+<body>
+    <h1>{request.document.title}</h1>
+
+    {#for table in request.tables}
+        {#include "HtmlGenerator/table" table=table /}
+    {/for}
+</body>
+</html>

@@ -1,0 +1,30 @@
+{
+    "version": "1.0",
+    "document": {
+      "title": "Custom CSS Report",
+      "author": "ITBH",
+      "subject": "A test for custom CSS",
+      "keywords": [ "css", "test" ],
+      "locale": "en-US",
+      "timezone": "UTC",
+      "formats": [
+        {
+          "format": "html",
+          "css": "classpath:test-style.css"
+        }
+      ]
+    },
+    "tables": [
+      {
+        "name": "Custom Styled Table",
+        "columns": [
+          { "name": "Column A", "type": "string" },
+          { "name": "Column B", "type": "string" }
+        ],
+        "rows": [
+          [ "Value 1", "Value 2" ],
+          [ "Value 3", "Value 4" ]
+        ]
+      }
+    ]
+  }
