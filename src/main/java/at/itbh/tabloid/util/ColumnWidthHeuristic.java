@@ -3,40 +3,50 @@ package at.itbh.tabloid.util;
 /**
  * Provides a simple heuristic to estimate the required column width for a given
  * text content.
- * <p>
- * This utility class calculates an approximate width based on the number of
- * characters
- * and an average character width factor, which is a common approach for quick
- * estimations
- * where precise font metric calculations are not feasible or necessary.
  */
 public final class ColumnWidthHeuristic {
 
     /**
-     * A fixed padding added to the calculated width to ensure content is not
-     * clipped.
-     * This provides a minimum margin.
+     * The padding to add for long text to ensure full visibility.
      */
-    private static final int PADDING = 12;
+    private static final int PADDING_FOR_LONG_TEXT = 30;
+
+    /**
+     * A smaller, specific padding for short text to give it a bit of breathing
+     * room.
+     */
+    private static final int PADDING_FOR_SHORT_TEXT = 10;
+
+    /**
+     * The character length at which we consider text "long" and start adding the
+     * larger padding.
+     */
+    private static final int PADDING_THRESHOLD = 30;
 
     private ColumnWidthHeuristic() {
         // Prevent instantiation of this utility class.
     }
 
     /**
-     * Calculates the estimated column width using stable integer arithmetic.
-     * The unit is intentionally abstract and has been tuned for ODS output.
+     * Calculates the estimated column width using a dual-padding system.
+     * This version uses stable integer arithmetic to avoid rounding errors.
      *
-     * @param text The text content of the cell.
+     * @param length The character length of the longest text in the column.
      * @return An estimated width sufficient to display the text.
      */
-    public static int calculateWidth(final String text) {
-        if (text == null || text.isEmpty()) {
-            return 0;
+    public static int calculateWidth(final int length) {
+        if (length <= 0) {
+            return 10; // A small, fixed default for empty columns
         }
-        // Use stable integer arithmetic to avoid floating-point inconsistencies.
-        // This approximates a 10% increase in width.
-        int length = text.length();
-        return length + (length / 10) + PADDING;
+
+        // Use stable integer math to calculate (length * 1.5) without losing precision
+        int baseWidth = (length * 15) / 10;
+
+        // Apply the correct padding based on the threshold
+        if (length > PADDING_THRESHOLD) {
+            return baseWidth + PADDING_FOR_LONG_TEXT;
+        } else {
+            return baseWidth + PADDING_FOR_SHORT_TEXT;
+        }
     }
 }

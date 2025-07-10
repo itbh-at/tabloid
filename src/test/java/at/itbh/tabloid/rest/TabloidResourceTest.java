@@ -100,6 +100,43 @@ public class TabloidResourceTest {
     }
 
     @Test
+    public void testOdsColumnWidthIsDynamic() throws Exception {
+        String json = loadResource("/test-payload-long-text.json");
+
+        byte[] fileBytes = given()
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept("application/vnd.oasis.opendocument.spreadsheet")
+                .body(json)
+                .when().post("/tables")
+                .then()
+                .statusCode(200)
+                .extract().asByteArray();
+
+        try (var doc = OdfSpreadsheetDocument.loadDocument(new ByteArrayInputStream(fileBytes))) {
+            OdfTable sheet = doc.getTableByName("Application Logs");
+            assertNotNull(sheet);
+
+            // Test a column OVER the threshold
+            OdfTableColumn logColumn = sheet.getColumnByIndex(2);
+            String longestLog = "User login attempt failed for user 'j.doe'. This is a very long log entry designed specifically to test the column width heuristic calculation performance. The string needs to be sufficiently long to force the heuristic to perform meaningful work.";
+            int expectedLogWidth = ColumnWidthHeuristic.calculateWidth(longestLog.length());
+            long actualLogWidth = logColumn.getWidth();
+            String logMessage = "Log Message column should be wide and include the large padding. Expected ~"
+                    + expectedLogWidth + " but was " + actualLogWidth;
+            assertTrue(Math.abs(expectedLogWidth - actualLogWidth) <= 2, logMessage);
+
+            // Test a column UNDER the threshold
+            OdfTableColumn serviceColumn = sheet.getColumnByIndex(1);
+            int serviceLength = "AuthenticationService".length();
+            int expectedServiceWidth = ColumnWidthHeuristic.calculateWidth(serviceLength);
+            long actualServiceWidth = serviceColumn.getWidth();
+            String serviceMessage = "Service column should be narrower and include the small padding. Expected ~"
+                    + expectedServiceWidth + " but was " + actualServiceWidth;
+            assertTrue(Math.abs(expectedServiceWidth - actualServiceWidth) <= 2, serviceMessage);
+        }
+    }
+
+    @Test
     public void testOdsColumnWidthHeuristic() throws Exception {
         String json = loadResource("/test-payload.json");
 
@@ -116,14 +153,14 @@ public class TabloidResourceTest {
             OdfTable sheet = doc.getTableByName("Regional Sales Performance");
             assertNotNull(sheet);
 
-            // The longest text overall is in the "Updated At" column:
-            // "2025-10-01T11:05:00+0200" (25 chars)
-            int expectedWidth = ColumnWidthHeuristic.calculateWidth("2025-10-01T11:05:00+0200");
-
+            // Test a column with content UNDER the threshold
             OdfTableColumn updatedAtColumn = sheet.getColumnByIndex(4);
-            assertNotNull(updatedAtColumn);
-
-            assertEquals(expectedWidth, updatedAtColumn.getWidth());
+            int updatedAtLength = "2025-10-01T11:05:00+0200".length();
+            int expectedUpdatedAtWidth = ColumnWidthHeuristic.calculateWidth(updatedAtLength);
+            long actualUpdatedAtWidth = updatedAtColumn.getWidth();
+            String message = "Width for date (<=30 chars) should be calculated correctly with small padding. Expected ~"
+                    + expectedUpdatedAtWidth + " but was " + actualUpdatedAtWidth;
+            assertTrue(Math.abs(expectedUpdatedAtWidth - actualUpdatedAtWidth) <= 2, message);
         }
     }
 

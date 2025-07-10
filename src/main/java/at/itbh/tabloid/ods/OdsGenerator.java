@@ -107,19 +107,20 @@ public class OdsGenerator {
 
     private int findMaxColumnWidth(Table tableData, int colIndex) {
         String headerName = tableData.columns().get(colIndex).name();
-        int maxWidth = ColumnWidthHeuristic.calculateWidth(headerName);
+        int maxLength = (headerName != null) ? headerName.length() : 0;
+
         for (List<Object> rowData : tableData.rows()) {
             if (colIndex < rowData.size()) {
                 Object cellValue = rowData.get(colIndex);
                 if (cellValue != null) {
-                    int cellWidth = ColumnWidthHeuristic.calculateWidth(cellValue.toString());
-                    if (cellWidth > maxWidth) {
-                        maxWidth = cellWidth;
+                    int currentLength = cellValue.toString().length();
+                    if (currentLength > maxLength) {
+                        maxLength = currentLength;
                     }
                 }
             }
         }
-        return maxWidth;
+        return ColumnWidthHeuristic.calculateWidth(maxLength);
     }
 
     private void createNamedStyles(OdfSpreadsheetDocument doc) throws Exception {

@@ -1,0 +1,25 @@
+{
+    "version": "1.0",
+    "document": {
+      "title": "System Log Report",
+      "author": "Test Suite",
+      "locale": "en-US",
+      "timezone": "UTC"
+    },
+    "tables": [
+      {
+        "name": "Application Logs",
+        "columns": [
+          { "name": "ID", "type": "number" },
+          { "name": "Service", "type": "string" },
+          { "name": "Log Message", "type": "string" },
+          { "name": "Timestamp", "type": "timestamp" }
+        ],
+        "rows": [
+          [ 1, "AuthenticationService", "User login attempt failed for user 'j.doe'. This is a very long log entry designed specifically to test the column width heuristic calculation performance. The string needs to be sufficiently long to force the heuristic to perform meaningful work.", "2025-07-10T14:30:00Z" ],
+          [ 2, "DatabaseConnector", "Connection successful.", "2025-07-10T14:30:01Z" ],
+          [ 3, "BillingService", "Invoice #12345 generated successfully.", "2025-07-10T14:31:00Z" ]
+        ]
+      }
+    ]
+  }
