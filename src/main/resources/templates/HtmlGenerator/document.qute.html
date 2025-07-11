@@ -1,14 +1,25 @@
 <!DOCTYPE html>
 <html lang="{#if request.document.locale}{request.document.locale.substring(0, 2)}{#else}en{/if}">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <title>{request.document.title}</title>
+
+    {#if request.document.author}
+    <meta name="author" content="{request.document.author}" />
+    {/if}
+    {#if request.document.subject}
+    <meta name="subject" content="{request.document.subject}" />
+    {/if}
+    {#if request.document.keywords and !request.document.keywords.isEmpty}
+    <meta name="keywords" content="{#for keyword in request.document.keywords}{keyword}{#if keyword_hasNext}, {/if}{/for}" />
+    {/if}
+
     {#if cssContent}
     <style>
         {cssContent}
     </style>
     {#else if cssPath}
-    <link rel="stylesheet" href="{cssPath}">
+    <link rel="stylesheet" href="{cssPath}" />
     {/if}
 </head>
 <body>

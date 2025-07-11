@@ -1,0 +1,25 @@
+{
+    "version": "1.0",
+    "document": {
+      "title": "Custom PDF Report",
+      "author": "ITBH Test Suite",
+      "formats": [
+        {
+          "format": "pdf",
+          "version": 1.7
+        }
+      ]
+    },
+    "tables": [
+      {
+        "name": "PDF Options Test Table",
+        "columns": [
+          { "name": "Key", "type": "string" },
+          { "name": "Value", "type": "string" }
+        ],
+        "rows": [
+          [ "Option", "PDF Version Test" ]
+        ]
+      }
+    ]
+  }

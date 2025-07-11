@@ -8,6 +8,7 @@ import at.itbh.tabloid.csv.CsvGenerator;
 import at.itbh.tabloid.html.HtmlGenerator;
 import at.itbh.tabloid.model.TabloidRequest;
 import at.itbh.tabloid.ods.OdsGenerator;
+import at.itbh.tabloid.pdf.PdfGenerator;
 import at.itbh.tabloid.xlsx.XlsxGenerator;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.POST;
@@ -23,14 +24,16 @@ public class TabloidResource {
     private final OdsGenerator odsGenerator;
     private final CsvGenerator csvGenerator;
     private final HtmlGenerator htmlGenerator;
+    private final PdfGenerator pdfGenerator;
     private final ObjectMapper objectMapper;
 
     public TabloidResource(XlsxGenerator xlsxGenerator, OdsGenerator odsGenerator, CsvGenerator csvGenerator,
-            HtmlGenerator htmlGenerator, ObjectMapper objectMapper) {
+            HtmlGenerator htmlGenerator, PdfGenerator pdfGenerator, ObjectMapper objectMapper) {
         this.xlsxGenerator = xlsxGenerator;
         this.odsGenerator = odsGenerator;
         this.csvGenerator = csvGenerator;
         this.htmlGenerator = htmlGenerator;
+        this.pdfGenerator = pdfGenerator;
         this.objectMapper = objectMapper;
     }
 
@@ -105,6 +108,19 @@ public class TabloidResource {
             String html = htmlGenerator.generate(request);
             String filename = request.document().title() + ".html";
             return Response.ok(html)
+                    .header("Content-Disposition", "attachment; filename=\"" + filename + "\"")
+                    .build();
+        });
+    }
+
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces("application/pdf")
+    public Response createPdf(JsonNode requestNode) throws Exception {
+        return processRequest(requestNode, (request) -> {
+            byte[] pdf = pdfGenerator.generate(request);
+            String filename = request.document().title() + ".pdf";
+            return Response.ok(pdf)
                     .header("Content-Disposition", "attachment; filename=\"" + filename + "\"")
                     .build();
         });

@@ -11,6 +11,11 @@ import org.odftoolkit.odfdom.doc.table.OdfTable;
 import org.odftoolkit.odfdom.doc.table.OdfTableCell;
 import org.odftoolkit.odfdom.doc.table.OdfTableColumn;
 
+import com.itextpdf.kernel.pdf.PdfDocument;
+import com.itextpdf.kernel.pdf.PdfReader;
+import com.itextpdf.kernel.pdf.canvas.parser.PdfTextExtractor;
+import com.itextpdf.kernel.pdf.canvas.parser.listener.SimpleTextExtractionStrategy;
+
 import at.itbh.tabloid.util.ColumnWidthHeuristic;
 
 import java.io.ByteArrayInputStream;
@@ -255,6 +260,42 @@ public class TabloidResourceTest {
                         containsString("color: green;"),
                         containsString("border: 5px dashed blue;"),
                         containsString("background-color: orange;"));
+    }
+
+    @Test
+    public void testPdfGenerationWithCustomVersion() throws IOException {
+        String json = loadResource("/test-payload-pdf-options.json");
+
+        byte[] fileBytes = given()
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept("application/pdf")
+                .body(json)
+                .when().post("/tables")
+                .then()
+                .statusCode(200)
+                .header("Content-Disposition", "attachment; filename=\"Custom PDF Report.pdf\"")
+                .extract().asByteArray();
+
+        assertNotNull(fileBytes);
+        assertTrue(fileBytes.length > 0);
+
+        try (PdfDocument pdfDoc = new PdfDocument(
+                new PdfReader(new ByteArrayInputStream(fileBytes)))) {
+            assertEquals("PDF-1.7", pdfDoc.getPdfVersion().toString(), "The PDF version should match the request.");
+            StringBuilder text = new StringBuilder();
+            int numberOfPages = pdfDoc.getNumberOfPages();
+            for (int i = 1; i <= numberOfPages; i++) {
+                SimpleTextExtractionStrategy strategy = new SimpleTextExtractionStrategy();
+                String pageText = PdfTextExtractor
+                        .getTextFromPage(pdfDoc.getPage(i), strategy);
+                text.append(pageText);
+            }
+            String fullText = text.toString();
+            assertNotNull(fullText);
+            assertTrue(fullText.contains("Custom PDF Report"), "PDF should contain the document title.");
+            assertTrue(fullText.contains("PDF Options Test Table"), "PDF should contain the table name.");
+            assertTrue(fullText.contains("PDF Version Test"), "PDF should contain data from the first row.");
+        }
     }
 
     private String loadResource(String path) throws IOException {
