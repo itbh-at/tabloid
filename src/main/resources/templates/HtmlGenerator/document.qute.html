@@ -14,6 +14,14 @@
     <meta name="keywords" content="{#for keyword in request.document.keywords}{keyword}{#if keyword_hasNext}, {/if}{/for}" />
     {/if}
 
+    {#if pageSize}
+    <style>
+        @page {
+            size: {pageSize};
+        }
+    </style>
+    {/if}
+
     {#if cssContent}
     <style>
         {cssContent}

@@ -5,7 +5,6 @@ import at.itbh.tabloid.model.TabloidRequest;
 import at.itbh.tabloid.model.format.HtmlFormatOptions;
 import io.quarkus.qute.Engine;
 import io.quarkus.qute.Template;
-import io.quarkus.qute.TemplateInstance;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
@@ -33,6 +32,10 @@ public class HtmlGenerator {
     }
 
     public String generate(TabloidRequest request) throws IOException, URISyntaxException {
+        return generate(request, null);
+    }
+
+    public String generate(TabloidRequest request, String pageSize) throws IOException, URISyntaxException {
         Optional<String> cssPathOpt = request.getFormatOptions(HtmlFormatOptions.class)
                 .map(HtmlFormatOptions::css)
                 .or(htmlConfig::css);
@@ -44,6 +47,7 @@ public class HtmlGenerator {
         return documentTemplate
                 .data("request", request)
                 .data("cssContent", cssContent)
+                .data("pageSize", pageSize)
                 .render();
     }
 
