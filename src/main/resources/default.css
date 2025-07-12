@@ -19,6 +19,7 @@ table {
     border-collapse: collapse;
     width: 100%;
     margin-top: 1em;
+    table-layout: fixed; 
 }
 
 thead {
@@ -29,6 +30,7 @@ th, td {
     border: 1px solid #ddd;
     padding: 8px;
     text-align: left;
+    word-wrap: break-word; 
 }
 
 th {
