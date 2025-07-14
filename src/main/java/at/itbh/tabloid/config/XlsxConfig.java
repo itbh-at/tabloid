@@ -12,4 +12,8 @@ public interface XlsxConfig {
     StyleConfig header();
 
     StyleConfig data();
+
+    StyleConfig rowHeader();
+
+    StyleConfig footer();
 }

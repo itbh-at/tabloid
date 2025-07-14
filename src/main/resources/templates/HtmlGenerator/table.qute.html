@@ -9,13 +9,45 @@
             </tr>
         </thead>
         <tbody>
-            {#for row in table.rows}
+            {#if hasFooterRow}
+              {#for row in table.rows.subList(0, table.rows.size() - 1)}
+                <tr>
+                    {#for cell in row}
+                        {#if cell_index == 0 && hasHeaderColumn}
+                        <th scope="row">{cell.toString}</th>
+                        {#else}
+                        <td>{#if cell}{cell.toString}{/if}</td>
+                        {/if}
+                    {/for}
+                </tr>
+              {/for}
+            {#else}
+              {#for row in table.rows}
+                <tr>
+                    {#for cell in row}
+                        {#if cell_index == 0 && hasHeaderColumn}
+                        <th scope="row">{cell.toString}</th>
+                        {#else}
+                        <td>{#if cell}{cell.toString}{/if}</td>
+                        {/if}
+                    {/for}
+                </tr>
+              {/for}
+            {/if}
+        </tbody>
+        {#if hasFooterRow}
+        <tfoot>
+            {#let footerRow = table.rows.get(table.rows.size() - 1)}
             <tr>
-                {#for cell in row}
+                {#for cell in footerRow}
+                   {#if cell_index == 0 && hasHeaderColumn}
+                    <th scope="row">{cell.toString}</th>
+                    {#else}
                     <td>{#if cell}{cell.toString}{/if}</td>
+                    {/if}
                 {/for}
             </tr>
-            {/for}
-        </tbody>
+        </tfoot>
+        {/if}
     </table>
 </section>

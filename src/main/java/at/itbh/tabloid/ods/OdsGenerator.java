@@ -7,6 +7,7 @@ import at.itbh.tabloid.config.StyleConfig;
 import at.itbh.tabloid.model.Column;
 import at.itbh.tabloid.model.Table;
 import at.itbh.tabloid.model.TabloidRequest;
+import at.itbh.tabloid.model.format.OdsFormatOptions;
 import at.itbh.tabloid.util.ColumnWidthHeuristic;
 import jakarta.enterprise.context.ApplicationScoped;
 import org.odftoolkit.odfdom.doc.OdfSpreadsheetDocument;
@@ -29,12 +30,15 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Optional;
 
 @ApplicationScoped
 public class OdsGenerator {
 
     private static final String HEADER_STYLE_NAME = "HeaderStyle";
     private static final String DATA_STYLE_NAME = "DataStyle";
+    private static final String ROW_HEADER_STYLE_NAME = "RowHeaderStyle";
+    private static final String FOOTER_STYLE_NAME = "FooterStyle";
 
     private final OdsConfig odsConfig;
     private static final DateTimeFormatter FLEXIBLE_TIMESTAMP_FORMATTER = new DateTimeFormatterBuilder()
@@ -56,6 +60,11 @@ public class OdsGenerator {
             doc.getOfficeMetadata().setSubject(request.document().subject());
 
             createNamedStyles(doc);
+
+            Optional<OdsFormatOptions> formatOptions = request.getFormatOptions(OdsFormatOptions.class);
+            boolean hasHeaderColumn = formatOptions.flatMap(o -> Optional.ofNullable(o.hasHeaderColumn()))
+                    .orElse(false);
+            boolean hasFooterRow = formatOptions.flatMap(o -> Optional.ofNullable(o.hasFooterRow())).orElse(false);
 
             for (int i = 0; i < request.tables().size(); i++) {
                 var tableData = request.tables().get(i);
@@ -83,16 +92,28 @@ public class OdsGenerator {
                             HEADER_STYLE_NAME);
                 }
 
-                for (int rowIndex = 0; rowIndex < tableData.rows().size(); rowIndex++) {
+                int numRows = tableData.rows().size();
+                for (int rowIndex = 0; rowIndex < numRows; rowIndex++) {
                     var rowData = tableData.rows().get(rowIndex);
+                    boolean isFooterRow = hasFooterRow && (rowIndex == numRows - 1);
+
                     for (int colIndex = 0; colIndex < rowData.size(); colIndex++) {
                         var column = tableData.columns().get(colIndex);
                         var value = rowData.get(colIndex);
                         OdfTableCell cell = sheet.getCellByPosition(colIndex, rowIndex + 1);
 
                         setCellValue(cell, value, column);
+
+                        String styleName;
+                        if (isFooterRow) {
+                            styleName = FOOTER_STYLE_NAME;
+                        } else if (hasHeaderColumn && colIndex == 0) {
+                            styleName = ROW_HEADER_STYLE_NAME;
+                        } else {
+                            styleName = DATA_STYLE_NAME;
+                        }
                         cell.getOdfElement().setAttributeNS(OdfDocumentNamespace.TABLE.getUri(), "table:style-name",
-                                DATA_STYLE_NAME);
+                                styleName);
                     }
                 }
             }
@@ -138,6 +159,14 @@ public class OdsGenerator {
         OdfStyle dataStyle = styles.newStyle(OdfStyleFamily.TableCell);
         dataStyle.setStyleNameAttribute(DATA_STYLE_NAME);
         populateStyleProperties(dataStyle, odsConfig.data());
+
+        OdfStyle rowHeaderStyle = styles.newStyle(OdfStyleFamily.TableCell);
+        rowHeaderStyle.setStyleNameAttribute(ROW_HEADER_STYLE_NAME);
+        populateStyleProperties(rowHeaderStyle, odsConfig.rowHeader());
+
+        OdfStyle footerStyle = styles.newStyle(OdfStyleFamily.TableCell);
+        footerStyle.setStyleNameAttribute(FOOTER_STYLE_NAME);
+        populateStyleProperties(footerStyle, odsConfig.footer());
     }
 
     private void populateStyleProperties(OdfStyle style, StyleConfig styleConfig) {

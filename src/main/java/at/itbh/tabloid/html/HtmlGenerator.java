@@ -32,11 +32,23 @@ public class HtmlGenerator {
     }
 
     public String generate(TabloidRequest request) throws IOException, URISyntaxException {
-        return generate(request, null);
+        Optional<HtmlFormatOptions> formatOptions = request.getFormatOptions(HtmlFormatOptions.class);
+        boolean hasHeaderColumn = formatOptions.flatMap(o -> Optional.ofNullable(o.hasHeaderColumn())).orElse(false);
+        boolean hasFooterRow = formatOptions.flatMap(o -> Optional.ofNullable(o.hasFooterRow())).orElse(false);
+        return generate(request, null, hasHeaderColumn, hasFooterRow);
     }
 
     public String generate(TabloidRequest request, String pageSize) throws IOException, URISyntaxException {
-        Optional<String> cssPathOpt = request.getFormatOptions(HtmlFormatOptions.class)
+        Optional<HtmlFormatOptions> formatOptions = request.getFormatOptions(HtmlFormatOptions.class);
+        boolean hasHeaderColumn = formatOptions.flatMap(o -> Optional.ofNullable(o.hasHeaderColumn())).orElse(false);
+        boolean hasFooterRow = formatOptions.flatMap(o -> Optional.ofNullable(o.hasFooterRow())).orElse(false);
+        return generate(request, pageSize, hasHeaderColumn, hasFooterRow);
+    }
+
+    public String generate(TabloidRequest request, String pageSize, boolean hasHeaderColumn, boolean hasFooterRow)
+            throws IOException, URISyntaxException {
+        Optional<HtmlFormatOptions> formatOptions = request.getFormatOptions(HtmlFormatOptions.class);
+        Optional<String> cssPathOpt = formatOptions
                 .map(HtmlFormatOptions::css)
                 .or(htmlConfig::css);
 
@@ -48,6 +60,8 @@ public class HtmlGenerator {
                 .data("request", request)
                 .data("cssContent", cssContent)
                 .data("pageSize", pageSize)
+                .data("hasHeaderColumn", hasHeaderColumn)
+                .data("hasFooterRow", hasFooterRow)
                 .render();
     }
 

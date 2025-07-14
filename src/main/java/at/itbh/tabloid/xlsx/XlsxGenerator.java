@@ -24,6 +24,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @ApplicationScoped
 public class XlsxGenerator {
@@ -49,12 +50,13 @@ public class XlsxGenerator {
             setDocumentProperties(request.document(), workbook);
             Map<String, CellStyle> styleCache = createStyles(workbook);
 
-            final XlsxFormatOptions xlsxOptions = request.getFormatOptions(XlsxFormatOptions.class)
-                    .orElse(null);
+            final Optional<XlsxFormatOptions> xlsxOptions = request.getFormatOptions(XlsxFormatOptions.class);
+            boolean hasHeaderColumn = xlsxOptions.flatMap(o -> Optional.ofNullable(o.hasHeaderColumn())).orElse(false);
+            boolean hasFooterRow = xlsxOptions.flatMap(o -> Optional.ofNullable(o.hasFooterRow())).orElse(false);
 
             for (Table table : request.tables()) {
                 Sheet sheet = workbook.createSheet(table.name());
-                applyFreezePanes(sheet, table, xlsxOptions);
+                applyFreezePanes(sheet, table, xlsxOptions.orElse(null));
                 Row headerRow = sheet.createRow(0);
                 for (int i = 0; i < table.columns().size(); i++) {
                     Cell headerCell = headerRow.createCell(i);
@@ -62,13 +64,25 @@ public class XlsxGenerator {
                     headerCell.setCellStyle(styleCache.get(StyleKey.HEADER));
                 }
 
-                int rowNum = 1;
-                for (List<Object> dataRow : table.rows()) {
-                    Row row = sheet.createRow(rowNum++);
+                int numRows = table.rows().size();
+                for (int rowIndex = 0; rowIndex < numRows; rowIndex++) {
+                    Row row = sheet.createRow(rowIndex + 1);
+                    List<Object> dataRow = table.rows().get(rowIndex);
+                    boolean isFooterRow = hasFooterRow && (rowIndex == numRows - 1);
+
                     for (int i = 0; i < dataRow.size(); i++) {
-                        createCell(workbook, row, i, dataRow.get(i), table.columns().get(i), styleCache);
+                        String styleKey;
+                        if (isFooterRow) {
+                            styleKey = StyleKey.FOOTER;
+                        } else if (hasHeaderColumn && i == 0) {
+                            styleKey = StyleKey.ROW_HEADER;
+                        } else {
+                            styleKey = StyleKey.DATA;
+                        }
+                        createCell(workbook, row, i, dataRow.get(i), table.columns().get(i), styleCache, styleKey);
                     }
                 }
+
                 if (xlsxConfig.autoSizeColumns()) {
                     for (int i = 0; i < table.columns().size(); i++) {
                         sheet.autoSizeColumn(i);
@@ -85,13 +99,18 @@ public class XlsxGenerator {
         if (globalOptions == null) {
             return;
         }
-        boolean freezeRow = globalOptions.freezeHeaderRow();
-        boolean freezeCol = globalOptions.freezeHeaderColumn();
-        XlsxTableOptions tableOptions = globalOptions.tables().get(table.name());
-        if (tableOptions != null) {
-            freezeRow = tableOptions.freezeHeaderRow();
-            freezeCol = tableOptions.freezeHeaderColumn();
+
+        boolean freezeRow = Optional.ofNullable(globalOptions.freezeHeaderRow()).orElse(false);
+        boolean freezeCol = Optional.ofNullable(globalOptions.freezeHeaderColumn()).orElse(false);
+
+        if (globalOptions.tables() != null) {
+            XlsxTableOptions tableOptions = globalOptions.tables().get(table.name());
+            if (tableOptions != null) {
+                freezeRow = Optional.ofNullable(tableOptions.freezeHeaderRow()).orElse(freezeRow);
+                freezeCol = Optional.ofNullable(tableOptions.freezeHeaderColumn()).orElse(freezeCol);
+            }
         }
+
         int colSplit = freezeCol ? 1 : 0;
         int rowSplit = freezeRow ? 1 : 0;
         if (colSplit > 0 || rowSplit > 0) {
@@ -100,49 +119,60 @@ public class XlsxGenerator {
     }
 
     private void createCell(XSSFWorkbook workbook, Row row, int colIndex, Object value, Column column,
-            Map<String, CellStyle> styleCache) {
+            Map<String, CellStyle> styleCache, String styleKey) {
         Cell cell = row.createCell(colIndex);
         if (value == null) {
-            cell.setCellStyle(styleCache.get(StyleKey.DATA));
+            cell.setCellStyle(styleCache.get(styleKey));
             return;
         }
 
         switch (column.type()) {
             case ColumnType.NUMBER:
             case ColumnType.CURRENCY:
-                cell.setCellValue(Double.parseDouble(value.toString()));
+                try {
+                    cell.setCellValue(Double.parseDouble(value.toString()));
+                } catch (NumberFormatException e) {
+                    cell.setCellValue(value.toString());
+                }
                 String numberFormat = column.format();
                 if (numberFormat != null && !numberFormat.isBlank()) {
-                    CellStyle numberStyle = styleCache.computeIfAbsent(numberFormat, k -> {
+                    String cacheKey = styleKey + "_" + numberFormat;
+                    CellStyle numberStyle = styleCache.computeIfAbsent(cacheKey, k -> {
                         CellStyle newStyle = workbook.createCellStyle();
-                        newStyle.cloneStyleFrom(styleCache.get(StyleKey.DATA));
-                        newStyle.setDataFormat(workbook.getCreationHelper().createDataFormat().getFormat(k));
+                        newStyle.cloneStyleFrom(styleCache.get(styleKey));
+                        newStyle.setDataFormat(workbook.getCreationHelper().createDataFormat().getFormat(numberFormat));
                         return newStyle;
                     });
                     cell.setCellStyle(numberStyle);
                 } else {
-                    cell.setCellStyle(styleCache.get(StyleKey.DATA));
+                    cell.setCellStyle(styleCache.get(styleKey));
                 }
                 break;
             case ColumnType.DATE:
-                cell.setCellValue(LocalDate.parse(value.toString()));
+                if (value != null && !value.toString().isBlank()) {
+                    cell.setCellValue(LocalDate.parse(value.toString()));
+                }
                 String dateFormat = "yyyy-mm-dd";
-                CellStyle dateStyle = styleCache.computeIfAbsent(dateFormat, k -> {
+                String dateCacheKey = styleKey + "_" + dateFormat;
+                CellStyle dateStyle = styleCache.computeIfAbsent(dateCacheKey, k -> {
                     CellStyle newStyle = workbook.createCellStyle();
-                    newStyle.cloneStyleFrom(styleCache.get(StyleKey.DATA));
-                    newStyle.setDataFormat(workbook.getCreationHelper().createDataFormat().getFormat(k));
+                    newStyle.cloneStyleFrom(styleCache.get(styleKey));
+                    newStyle.setDataFormat(workbook.getCreationHelper().createDataFormat().getFormat(dateFormat));
                     return newStyle;
                 });
                 cell.setCellStyle(dateStyle);
                 break;
             case ColumnType.TIMESTAMP:
-                cell.setCellValue(
-                        Date.from(ZonedDateTime.parse(value.toString(), FLEXIBLE_TIMESTAMP_FORMATTER).toInstant()));
+                if (value != null && !value.toString().isBlank()) {
+                    cell.setCellValue(
+                            Date.from(ZonedDateTime.parse(value.toString(), FLEXIBLE_TIMESTAMP_FORMATTER).toInstant()));
+                }
                 String tsFormat = "yyyy-mm-dd hh:mm:ss";
-                CellStyle tsStyle = styleCache.computeIfAbsent(tsFormat, k -> {
+                String tsCacheKey = styleKey + "_" + tsFormat;
+                CellStyle tsStyle = styleCache.computeIfAbsent(tsCacheKey, k -> {
                     CellStyle newStyle = workbook.createCellStyle();
-                    newStyle.cloneStyleFrom(styleCache.get(StyleKey.DATA));
-                    newStyle.setDataFormat(workbook.getCreationHelper().createDataFormat().getFormat(k));
+                    newStyle.cloneStyleFrom(styleCache.get(styleKey));
+                    newStyle.setDataFormat(workbook.getCreationHelper().createDataFormat().getFormat(tsFormat));
                     return newStyle;
                 });
                 cell.setCellStyle(tsStyle);
@@ -150,7 +180,7 @@ public class XlsxGenerator {
             case ColumnType.STRING:
             default:
                 cell.setCellValue(value.toString());
-                cell.setCellStyle(styleCache.get(StyleKey.DATA));
+                cell.setCellStyle(styleCache.get(styleKey));
                 break;
         }
     }
@@ -173,6 +203,8 @@ public class XlsxGenerator {
         Map<String, CellStyle> styles = new HashMap<>();
         styles.put(StyleKey.HEADER, createCellStyle(workbook, xlsxConfig.header()));
         styles.put(StyleKey.DATA, createCellStyle(workbook, xlsxConfig.data()));
+        styles.put(StyleKey.ROW_HEADER, createCellStyle(workbook, xlsxConfig.rowHeader()));
+        styles.put(StyleKey.FOOTER, createCellStyle(workbook, xlsxConfig.footer()));
         return styles;
     }
 

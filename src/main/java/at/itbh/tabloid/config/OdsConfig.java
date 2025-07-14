@@ -12,4 +12,8 @@ public interface OdsConfig {
     StyleConfig header();
 
     StyleConfig data();
+
+    StyleConfig rowHeader();
+
+    StyleConfig footer();
 }

@@ -2,6 +2,7 @@ package at.itbh.tabloid.pdf;
 
 import at.itbh.tabloid.html.HtmlGenerator;
 import at.itbh.tabloid.model.TabloidRequest;
+import at.itbh.tabloid.model.format.HtmlFormatOptions;
 import at.itbh.tabloid.model.format.PdfFormatOptions;
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -19,9 +20,17 @@ public class PdfGenerator {
 
     public byte[] generate(TabloidRequest request) throws Exception {
         Optional<PdfFormatOptions> pdfOptions = request.getFormatOptions(PdfFormatOptions.class);
+        Optional<HtmlFormatOptions> htmlOptions = request.getFormatOptions(HtmlFormatOptions.class);
         String pageSize = pdfOptions.flatMap(o -> Optional.ofNullable(o.size())).orElse(null);
         Optional<Double> pdfVersion = pdfOptions.flatMap(o -> Optional.ofNullable(o.version()));
-        String html = htmlGenerator.generate(request, pageSize);
+
+        boolean hasHeaderColumn = pdfOptions.flatMap(o -> Optional.ofNullable(o.hasHeaderColumn()))
+                .orElse(htmlOptions.flatMap(h -> Optional.ofNullable(h.hasHeaderColumn())).orElse(false));
+
+        boolean hasFooterRow = pdfOptions.flatMap(o -> Optional.ofNullable(o.hasFooterRow()))
+                .orElse(htmlOptions.flatMap(h -> Optional.ofNullable(h.hasFooterRow())).orElse(false));
+
+        String html = htmlGenerator.generate(request, pageSize, hasHeaderColumn, hasFooterRow);
 
         try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
             PdfRendererBuilder builder = new PdfRendererBuilder();
