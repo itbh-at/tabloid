@@ -21,3 +21,10 @@ th {
     background-color: orange;
     color: white;
 }
+
+@media print {
+    tr {
+      page-break-inside: avoid;
+      break-inside: avoid; 
+    }
+  }
