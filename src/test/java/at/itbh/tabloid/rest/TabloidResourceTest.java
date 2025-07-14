@@ -1,6 +1,7 @@
 package at.itbh.tabloid.rest;
 
 import io.quarkus.test.junit.QuarkusTest;
+import java.util.logging.Logger;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -22,12 +23,16 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.*;
 
 @QuarkusTest
 public class TabloidResourceTest {
+
+    private static final Logger LOGGER = Logger.getLogger(TabloidResourceTest.class.getName());
 
     @Test
     public void testXlsxGeneration() throws IOException {
@@ -296,6 +301,60 @@ public class TabloidResourceTest {
             assertTrue(fullText.contains("PDF Options Test Table"), "PDF should contain the table name.");
             assertTrue(fullText.contains("PDF Version Test"), "PDF should contain data from the first row.");
         }
+    }
+
+    @Test
+    public void testGenerationPerformance() throws IOException {
+        Map<String, String> formats = new LinkedHashMap<>();
+        formats.put("XLSX", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        formats.put("ODS", "application/vnd.oasis.opendocument.spreadsheet");
+        formats.put("CSV", "text/csv");
+        formats.put("HTML", MediaType.TEXT_HTML);
+        formats.put("PDF", "application/pdf");
+
+        String payload10Rows = loadResource("/test-payload-10-rows.json");
+        String payload100Rows = loadResource("/test-payload-100-rows.json");
+
+        Map<String, Long> results10Rows = new LinkedHashMap<>();
+        Map<String, Long> results100Rows = new LinkedHashMap<>();
+
+        LOGGER.info("\n--- Starting Generation Performance Test ---");
+
+        for (Map.Entry<String, String> format : formats.entrySet()) {
+            long startTime10 = System.currentTimeMillis();
+            given()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(format.getValue())
+                    .body(payload10Rows)
+                    .when().post("/tables")
+                    .then().statusCode(200);
+            long endTime10 = System.currentTimeMillis();
+            results10Rows.put(format.getKey(), endTime10 - startTime10);
+
+            long startTime100 = System.currentTimeMillis();
+            given()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(format.getValue())
+                    .body(payload100Rows)
+                    .when().post("/tables")
+                    .then().statusCode(200);
+            long endTime100 = System.currentTimeMillis();
+            results100Rows.put(format.getKey(), endTime100 - startTime100);
+        }
+
+        StringBuilder table = new StringBuilder();
+        table.append("\n--- Generation Performance Results ---\n");
+        table.append("--------------------------------------------------\n");
+        table.append(String.format("| %-10s | %-15s | %-15s |\n", "Format", "10 Rows (ms)", "100 Rows (ms)"));
+        table.append("--------------------------------------------------\n");
+        for (String formatKey : formats.keySet()) {
+            table.append(String.format("| %-10s | %-15d | %-15d |\n",
+                    formatKey,
+                    results10Rows.get(formatKey),
+                    results100Rows.get(formatKey)));
+        }
+        table.append("--------------------------------------------------");
+        LOGGER.info(table.toString());
     }
 
     private String loadResource(String path) throws IOException {

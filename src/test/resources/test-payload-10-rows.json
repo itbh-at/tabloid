@@ -1,0 +1,316 @@
+{
+  "version": "1.0",
+  "document": {
+    "title": "Column Sizing Showcase",
+    "author": "Postman Test"
+  },
+  "tables": [
+    {
+      "name": "Dynamic Widths",
+      "columns": [
+        {
+          "name": "ID",
+          "type": "number"
+        },
+        {
+          "name": "Code",
+          "type": "string"
+        },
+        {
+          "name": "ShortStr",
+          "type": "string"
+        },
+        {
+          "name": "Medium-Length Header",
+          "type": "string"
+        },
+        {
+          "name": "Exactly 30 Characters Header!",
+          "type": "string"
+        },
+        {
+          "name": "This Header is 31 Chars Long",
+          "type": "string"
+        },
+        {
+          "name": "This is a Very Long Header for a Column with Short Data",
+          "type": "string"
+        },
+        {
+          "name": "Short Hdr",
+          "type": "string"
+        },
+        {
+          "name": "Tiny",
+          "type": "string"
+        },
+        {
+          "name": "Fooooooooooooooooooooooo",
+          "type": "string"
+        },
+        {
+          "name": "Bar",
+          "type": "string"
+        },
+        {
+          "name": "Bazzzzzzzzzzzzzzzzzzzzzzzz",
+          "type": "string"
+        },
+        {
+          "name": "Status",
+          "type": "string"
+        },
+        {
+          "name": "Flag A",
+          "type": "string"
+        },
+        {
+          "name": "Flag B",
+          "type": "string"
+        },
+        {
+          "name": "Flag C",
+          "type": "string"
+        },
+        {
+          "name": "Notes",
+          "type": "string"
+        },
+        {
+          "name": "URL",
+          "type": "string"
+        },
+        {
+          "name": "UUID",
+          "type": "string"
+        },
+        {
+          "name": "Empty",
+          "type": "string"
+        }
+      ],
+      "rows": [
+        [
+          1,
+          "ES39LI",
+          "uGPK",
+          "LeKrSbJaSRCgy",
+          "SAVR4PmbMhRf4m1VlJJE3pVFT0DUsy",
+          "pfI916Ka8WfOov4sTLPFEu6AK9MkZJb",
+          "qv n",
+          "bNCzp",
+          "Y",
+          "QNdSzb3IFfs15EVwJQ9",
+          "3VD2fuSy",
+          "HUDGT5zxCELx13kilo0iO45j",
+          "Completed",
+          true,
+          false,
+          true,
+          "GGsSwj0gOCfAhyWIZ6Mj1SFfn8Vjdt4QNGgBSEaCi147ulQvoTLIqL3tXxODtV0xZ0MMRDiU2I9ZYqgQlpJHke7viiEgHV6WElvm4HPP3eMMMrrKIMz unVNRDRjXoDQPYvyupTyDsvZJ 46L F7Y1v3ZMOXuoMm9z00IPMI2Q69Y4KY0RG3SNksStgA C38D. HfEakXJoIUV R2YfrMB RdtOLCBGHEPoaQc Efu1AGDL",
+          "https://www.example.com/qznaisvtm/783",
+          "bC741102-eaDe-F792-1d7D-2dc14cFA3B80",
+          null
+        ],
+        [
+          2,
+          "IFM4QM",
+          "nLttKa",
+          "AMHxBiOfmyxaHPvETYXIHWgCy",
+          "OKJxGPhYJNccT7dhXhj19p6W3Sx997",
+          "VjSC uttRd80OZ1PslM6HQnazR5eeeR",
+          "KcO",
+          "gdtUT",
+          "C",
+          "hl7o8kelYd5yRE0PJ0OuZoNaT",
+          "H133KNP3",
+          "xkIYewmfbEv0AI35zF4xUF",
+          "Error",
+          true,
+          false,
+          true,
+          "YAr08kvy 0WsV9Odo1DlKzx469iZffcB8FubraYxlU9Gaf6dlZUgEW70vGcqCTMJIXb. o0z4mrugUhkjFnSYAT5BATTvqGLe9wbpKvd",
+          "https://www.example.com/wecwkdqbdyo/318",
+          "D69C5Fc1-20be-AbBA-6eE7-a4ceFEaf8109",
+          null
+        ],
+        [
+          3,
+          "6HH8GE",
+          "lvq",
+          "IaxhxAGjOjfuADNFhveAFEHIZ",
+          "m9ygQFfrWwx3y1Nnv8276guAbEYo2T",
+          "mBqKqs22RsafAs2iugYw5e9f116ONJ1",
+          "Ta",
+          "iuteK",
+          "C",
+          " LQ098aFjk8YeIKgmE",
+          "qU9U",
+          "xxLRyEO4JXUAZcZshVwCNcUm",
+          "OK",
+          true,
+          false,
+          true,
+          "mF3yqX8mG8E9RYKBLVN9L1c6WFFokXB3sgl7M6kvHYoiCSmAfYD3eYb9DAKTvzH4oZP qXhzq. vJJytL5uOwNuiHRFJFyJacvI2bXBnFH6",
+          "https://www.example.com/vexsgif/442",
+          "5ED8f5fD-BeAc-e347-9df7-2195aE228aC1",
+          null
+        ],
+        [
+          4,
+          "B7S0SF",
+          "bbcccOP",
+          "fBnUXZdTcIn i",
+          "5ql9ik6XDg7QXUjGD2T7BMCfW8gET9",
+          "bSicOS Zq2sjGnGUMrOwiQ1hYNVh4Ds",
+          "XGp",
+          "mwuAF",
+          "A",
+          "bP42EwSaHZv4Wmtw3I5Xnf",
+          "wKziut",
+          "UjO00RTClAvVXauYjuadsnz5r",
+          "Completed",
+          true,
+          false,
+          false,
+          "Hm972ptCyy2Go64fIITGF6czyukvmp3wes8HCn36ViA8i3AkH07crYx0yo6WyA04m5l0B6vdS vsBUcSylh3e3Hc708 yaLLcGZUrThbKAq6iWvA2V VN3ipL9Hvk5E9uTZhAFEHMb2MKeNkphrJ1qKkuXDo4g2bGblqaC35. 9rc0 5kf8pibvc066rEcTSjqK3KT0JjR1",
+          "https://www.test.org/lllwmmt/770",
+          "AF2feECe-6a1C-a0dd-D33e-bd7EdB4Bb2bC",
+          ""
+        ],
+        [
+          5,
+          "8V8MLN",
+          "Wjt",
+          " NvCsGcdPPcC",
+          "cZBhAiMoOTHjmO2VtCxOdCNPfKVJrD",
+          "xpGESV8KnPpzRwRsFmVtGRk8JIGKqAK",
+          "WG5 5",
+          "xkIO",
+          "C",
+          "FmKvhCZfD5zDRZxV1EjhNG4Tu",
+          "kEQ",
+          "eV kX1CNJDF9upxLZ",
+          "Completed",
+          true,
+          true,
+          true,
+          "x9iUNBIUys3VreZaUX8MN9XdeSw1QtNIdvtN8nLOhoaZe QwDcEXQAAy7sg8XGPFbD11B2b7uTcu1BbQFRn7wNim1y9masDtFsaIq5n IEB29FqvPhcTE7Iktk0QTcz47C4tOJq. kKFOGbqXqP48rO2ec11wx0pkzYAi",
+          "https://www.example.com/wjdsxtrk/348",
+          "c3251Ac9-2e76-aaD5-Fb0A-5fE07BfFE2eE",
+          ""
+        ],
+        [
+          6,
+          "RTVRPS",
+          "qYhUT",
+          "zxLovzhRiu",
+          "wM2hVRNnAa6JN70ZDDgRIf6kRZfasF",
+          "6SRm7eCBzkTpjzil9TS PRKSIdBuNL6",
+          "ML4o",
+          "wXzZB",
+          "X",
+          " mQ8u8PmDqO8WjMrPFzQppG",
+          "bcsoJI",
+          "e4k4nvV8ZeT5HtKeW",
+          "Error",
+          false,
+          false,
+          false,
+          "kxq5uNZSqIPe4n9p5zDGLB9q1jEZmICHiyDa9dw68Dk NZ78Xtn3X9 vq0BaFPjy T1VUHGdcFbz1jdG0sIKfKUO3s4pzbGEaJ6t2NnOKQY9enfE4du9sAEqAfRaJVg83UZkeWGEV9QAIaDKFHxJka21tSUzDzZPjoi8FYdgYzL4JYSkpPKCVlehYbi1SmJ5fzXoh. Cn0zLS3d7Ba7U16q9RRGrb4AkfnsgnQg5zYe",
+          "https://www.test.org/glttmakgaaqrs/437",
+          "Efb4De5C-E976-fdE2-3Afe-FB6E9eD1F348",
+          null
+        ],
+        [
+          7,
+          "00C28M",
+          "sfV",
+          "oppGuai BfpaTpcJzHAGUyY",
+          "IvNcYMce9EopmnWcWcBtZUfiTrVgom",
+          "YlRS0IWeA8Ot8BS0mjPFoMU9oeYEoeG",
+          "OSa",
+          "EHxQv",
+          "X",
+          "yCjqAKyeQ489dF9Fru0Qw6f",
+          "BHtlwykV",
+          "DPPA vNgcPxnGz8M KyOZEvU",
+          "Failed",
+          true,
+          true,
+          true,
+          "NEL4o49blkDNIOgweFM4HLeeZdMkmqBld4yY7Jr 9IGGZ7n2RtxVhg0df0ovZAybt5pGN5 USQWX. nbSAQmXO5dEpZTkTY99 byNukheht",
+          "https://www.test.org/ywuony/960",
+          "f9ecEe65-A600-CCfe-5104-f4F9e7Bee1bb",
+          ""
+        ],
+        [
+          8,
+          "O1ICX3",
+          "TEEuGfn",
+          "aRZSlITKSo",
+          "fkJr27YpsepNScRn4X4y9rMKhY2ICB",
+          "kGVHnWLRUyWM8vWAHUiw2w96Wzvlkrm",
+          "NK",
+          "SwLx",
+          "",
+          "bB3yMulykcs9uyvGHuOqt0m",
+          "DMLLnJ5",
+          "VV3KSHFWesNkTF9j",
+          "Pending",
+          false,
+          false,
+          false,
+          "cLWMMyQB UY2OBP8VScGYO88Ssa03yAU3N6sgTNCAt651z5gsnIePsHZZ1RctQawygTh2SCb8v 2cwRVokSc1AKv Safhg45qs3votNq7ZDr9AZ21Rp6wuls9hqdEON6Ct. 6Y1vWda79hyuO6r8UNJLjygB5Yf8F",
+          "https://www.example.com/ruogsvqzplwezy/113",
+          "a0Cf9862-79f0-02F2-fD6A-d687AeAA27C2",
+          "1PcBI"
+        ],
+        [
+          9,
+          "W8NAXP",
+          "kiiQVknW",
+          "vUmowpmDXMEGGoSCdP",
+          "mZc3MG5jNcWVFtpV4uW4ZP omDIA3Q",
+          "d0e8YkGSopq5mSfm5jx36Ge1zGlMddm",
+          "TMr ",
+          "mdxrcF",
+          "Z",
+          "QwCXhfYj2S0 tAbMBG",
+          "mD69",
+          "trTgscOjSGfXj XSeBa7VKCSC",
+          "Warning",
+          false,
+          true,
+          true,
+          "UqE2b64bVFx3w7rI42taVmYnS9SCW7UtcDZsbQXAL2iR2LPc2238YyjeBsh7ZKfnjMEyhGcJgPc03laXny277Q52OJ8OhAzmKi6MDFnhTXKHwv3QW38DCKjoLbGTWH7UUxvykXwqvbjVV7shGTCQppt6C449V3Gz2Suei9yHq1u. N5SB2CvlyzxcwndaQ32HU5dU0Rp ztIox",
+          "https://www.test.org/aqnwhsde/681",
+          "03D14887-82B2-FE9d-35F8-0CECbc25dfD1",
+          null
+        ],
+        [
+          10,
+          "0ITBZS",
+          "XKMJwvj",
+          " gXsGpzXrFSH JLjkvoMkWh",
+          "ztXb3nktpmt114i1gULMErLOKy5vJr",
+          "jP8cJWP84XmkF2P0qL4LNlj0D2aoTPL",
+          "E1",
+          "tDT",
+          "Z",
+          "EpaNq3f4IRc9vq2ACtlLthH",
+          "oAhAy4U",
+          "8sD6PEuUOwN5KXum gsYUiWJ",
+          "Pending",
+          true,
+          true,
+          false,
+          "Sv dROEhrVI nGSvCsaUQcOFA7yBG2qFjzixd yVgMrdH12IqiIcbZDY2tRy2x5ploWbIb9Epgzhc7nrqtFM4L5UP04L7olaxRR2QeTSMNySMfsLpjJJ50qQE1D4HkJBdSpdyzXRm. y4jMF94EbaukkABAksmB",
+          "https://www.test.org/veolx/539",
+          "90A0d9D9-1D95-d2De-dd71-33dbbd74B8e6",
+          "W0CZySt"
+        ]
+      ]
+    }
+  ]
+}
