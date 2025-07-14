@@ -13,10 +13,11 @@
               {#for row in table.rows.subList(0, table.rows.size() - 1)}
                 <tr>
                     {#for cell in row}
+                        {#let alignment=table.columns.get(cell_index).alignment}
                         {#if cell_index == 0 && hasHeaderColumn}
-                        <th scope="row">{cell.toString}</th>
+                        <th scope="row" style="text-align:{#if alignment && alignment.horizontal}{alignment.horizontal}{#else if table.columns.get(cell_index).type == 'string'}left#{#else}right{/if}; vertical-align:{#if alignment && alignment.vertical}{alignment.vertical}{#else}top{/if};">{cell.toString}</th>
                         {#else}
-                        <td>{#if cell}{cell.toString}{/if}</td>
+                        <td style="text-align:{#if alignment && alignment.horizontal}{alignment.horizontal}{#else if table.columns.get(cell_index).type == 'string'}left#{#else}right{/if}; vertical-align:{#if alignment && alignment.vertical}{alignment.vertical}{#else}top{/if};">{#if cell}{cell.toString}{/if}</td>
                         {/if}
                     {/for}
                 </tr>
@@ -25,10 +26,11 @@
               {#for row in table.rows}
                 <tr>
                     {#for cell in row}
+                        {#let alignment=table.columns.get(cell_index).alignment}
                         {#if cell_index == 0 && hasHeaderColumn}
-                        <th scope="row">{cell.toString}</th>
+                        <th scope="row" style="text-align:{#if alignment && alignment.horizontal}{alignment.horizontal}{#else if table.columns.get(cell_index).type == 'string'}left#{#else}right{/if}; vertical-align:{#if alignment && alignment.vertical}{alignment.vertical}{#else}top{/if};">{cell.toString}</th>
                         {#else}
-                        <td>{#if cell}{cell.toString}{/if}</td>
+                        <td style="text-align:{#if alignment && alignment.horizontal}{alignment.horizontal}{#else if table.columns.get(cell_index).type == 'string'}left#{#else}right{/if}; vertical-align:{#if alignment && alignment.vertical}{alignment.vertical}{#else}top{/if};">{#if cell}{cell.toString}{/if}</td>
                         {/if}
                     {/for}
                 </tr>
@@ -40,10 +42,11 @@
             {#let footerRow = table.rows.get(table.rows.size() - 1)}
             <tr>
                 {#for cell in footerRow}
-                   {#if cell_index == 0 && hasHeaderColumn}
-                    <th scope="row">{cell.toString}</th>
+                    {#let alignment=table.columns.get(cell_index).alignment}
+                    {#if cell_index == 0 && hasHeaderColumn}
+                    <th scope="row" style="text-align:{#if alignment && alignment.horizontal}{alignment.horizontal}{#else if table.columns.get(cell_index).type == 'string'}left#{#else}right{/if}; vertical-align:{#if alignment && alignment.vertical}{alignment.vertical}{#else}top{/if};">{cell.toString}</th>
                     {#else}
-                    <td>{#if cell}{cell.toString}{/if}</td>
+                    <td style="text-align:{#if alignment && alignment.horizontal}{alignment.horizontal}{#else if table.columns.get(cell_index).type == 'string'}left#{#else}right{/if}; vertical-align:{#if alignment && alignment.vertical}{alignment.vertical}{#else}top{/if};">{#if cell}{cell.toString}{/if}</td>
                     {/if}
                 {/for}
             </tr>

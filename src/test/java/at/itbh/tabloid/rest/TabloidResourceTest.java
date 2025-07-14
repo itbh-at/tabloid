@@ -62,8 +62,10 @@ public class TabloidResourceTest {
             CellStyle headerStyle = headerRow.getCell(0).getCellStyle();
             Font headerFont = workbook.getFontAt(headerStyle.getFontIndex());
             assertTrue(headerFont.getBold(), "Header font should be bold.");
-
-            CellStyle dataStyle = dataRow.getCell(0).getCellStyle();
+            CellStyle rowHeaderStyle = dataRow.getCell(0).getCellStyle();
+            Font rowHeaderFont = workbook.getFontAt(rowHeaderStyle.getFontIndex());
+            assertTrue(rowHeaderFont.getBold(), "Row header font should be bold.");
+            CellStyle dataStyle = dataRow.getCell(1).getCellStyle();
             Font dataFont = workbook.getFontAt(dataStyle.getFontIndex());
             assertFalse(dataFont.getBold(), "Data font should NOT be bold.");
             assertEquals("Arial", dataFont.getFontName(), "Data font should be Arial.");
@@ -71,6 +73,44 @@ public class TabloidResourceTest {
             int longHeaderColumnIndex = 2;
             assertTrue(sheet1.getColumnWidth(longHeaderColumnIndex) > (12 * 256),
                     "Column with long header should be auto-sized.");
+        }
+    }
+
+    @Test
+    public void testAlignment() throws IOException {
+        String json = loadResource("/test-payload-alignment.json");
+
+        byte[] fileBytes = given()
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+                .body(json)
+                .when().post("/tables")
+                .then()
+                .statusCode(200)
+                .extract().asByteArray();
+
+        assertNotNull(fileBytes);
+        assertTrue(fileBytes.length > 0);
+
+        try (XSSFWorkbook workbook = new XSSFWorkbook(new ByteArrayInputStream(fileBytes))) {
+            Sheet sheet1 = workbook.getSheet("Alignment");
+            assertNotNull(sheet1, "Sheet 'Alignment' should exist.");
+            Row dataRow = sheet1.getRow(1);
+            assertNotNull(dataRow, "Data row should exist.");
+            CellStyle leftStyle = dataRow.getCell(0).getCellStyle();
+            assertEquals(HorizontalAlignment.LEFT, leftStyle.getAlignment(), "Column 'Left' should be left-aligned.");
+            assertEquals(VerticalAlignment.TOP, leftStyle.getVerticalAlignment(),
+                    "Column 'Left' should be top-aligned.");
+            CellStyle centerStyle = dataRow.getCell(1).getCellStyle();
+            assertEquals(HorizontalAlignment.CENTER, centerStyle.getAlignment(),
+                    "Column 'Center' should be center-aligned.");
+            assertEquals(VerticalAlignment.CENTER, centerStyle.getVerticalAlignment(),
+                    "Column 'Center' should be center-aligned.");
+            CellStyle rightStyle = dataRow.getCell(2).getCellStyle();
+            assertEquals(HorizontalAlignment.RIGHT, rightStyle.getAlignment(),
+                    "Column 'Right' should be right-aligned.");
+            assertEquals(VerticalAlignment.BOTTOM, rightStyle.getVerticalAlignment(),
+                    "Column 'Right' should be bottom-aligned.");
         }
     }
 
@@ -91,8 +131,8 @@ public class TabloidResourceTest {
         assertTrue(fileBytes.length > 0);
 
         try (var doc = OdfSpreadsheetDocument.loadDocument(new ByteArrayInputStream(fileBytes))) {
-            assertEquals("Q3 2025 Sales Report", doc.getOfficeMetadata().getTitle());
-            assertEquals("ITBH", doc.getOfficeMetadata().getCreator());
+            assertEquals("Q3 2025 Comprehensive Sales Report", doc.getOfficeMetadata().getTitle());
+            assertEquals("ITBH Test Suite", doc.getOfficeMetadata().getCreator());
 
             OdfTable sheet = doc.getTableByName("Regional Sales Performance");
             assertNotNull(sheet, "Sheet 'Regional Sales Performance' should exist.");
@@ -163,14 +203,13 @@ public class TabloidResourceTest {
             OdfTable sheet = doc.getTableByName("Regional Sales Performance");
             assertNotNull(sheet);
 
-            // Test a column with content UNDER the threshold
-            OdfTableColumn updatedAtColumn = sheet.getColumnByIndex(4);
-            int updatedAtLength = "2025-10-01T11:05:00+0200".length();
-            int expectedUpdatedAtWidth = ColumnWidthHeuristic.calculateWidth(updatedAtLength);
-            long actualUpdatedAtWidth = updatedAtColumn.getWidth();
+            OdfTableColumn dateColumn = sheet.getColumnByIndex(3);
+            int dateLength = "Last Sale Date".length(); // Header is the longest string
+            int expectedDateWidth = ColumnWidthHeuristic.calculateWidth(dateLength);
+            long actualDateWidth = dateColumn.getWidth();
             String message = "Width for date (<=30 chars) should be calculated correctly with small padding. Expected ~"
-                    + expectedUpdatedAtWidth + " but was " + actualUpdatedAtWidth;
-            assertTrue(Math.abs(expectedUpdatedAtWidth - actualUpdatedAtWidth) <= 2, message);
+                    + expectedDateWidth + " but was " + actualDateWidth;
+            assertTrue(Math.abs(expectedDateWidth - actualDateWidth) <= 2, message);
         }
     }
 
@@ -190,10 +229,10 @@ public class TabloidResourceTest {
         assertNotNull(csvOutput);
 
         String[] lines = csvOutput.split("\\R");
-        assertEquals(6, lines.length, "Should be 6 lines: 1 header + 5 data rows");
-        assertEquals("\"Region\",\"Units Sold\",\"Total Revenue\",\"Last Sale Date\",\"Updated At\"", lines[0]);
-        assertEquals("\"North\",5430,123456.78,\"2025-09-30\",\"2025-10-01T10:18:39Z\"", lines[1]);
-        assertEquals("\"Central\",\"\",\"\",\"\",\"\"", lines[5]);
+        assertEquals(12, lines.length, "Should be 12 lines: 1 header + 11 data rows");
+        assertEquals("\"Region\",\"Units Sold\",\"Total Revenue\",\"Last Sale Date\"", lines[0]);
+        assertEquals("\"North\",5430,123456.78,\"2025-09-30\"", lines[1]);
+        assertEquals("\"Total\",46510,1059154.38,\"\"", lines[11]);
     }
 
     @Test
@@ -240,13 +279,13 @@ public class TabloidResourceTest {
                 .then()
                 .statusCode(200)
                 .header("Content-Type", containsString(MediaType.TEXT_HTML))
-                .header("Content-Disposition", "attachment; filename=\"Q3 2025 Sales Report.html\"")
+                .header("Content-Disposition", "attachment; filename=\"Q3 2025 Comprehensive Sales Report.html\"")
                 .body(
                         containsString("<!DOCTYPE html>"),
-                        containsString("<h1>Q3 2025 Sales Report</h1>"),
+                        containsString("<h1>Q3 2025 Comprehensive Sales Report</h1>"),
                         containsString("<h2>Regional Sales Performance</h2>"),
-                        containsString("<td>North</td>"),
-                        containsString("<td>123456.78</td>"));
+                        containsString("North"),
+                        containsString("123456.78"));
     }
 
     @Test
@@ -300,6 +339,32 @@ public class TabloidResourceTest {
             assertTrue(fullText.contains("Custom PDF Report"), "PDF should contain the document title.");
             assertTrue(fullText.contains("PDF Options Test Table"), "PDF should contain the table name.");
             assertTrue(fullText.contains("PDF Version Test"), "PDF should contain data from the first row.");
+        }
+    }
+
+    @Test
+    public void testPdfWithStructuralElements() throws IOException {
+        String json = loadResource("/test-payload-structural.json");
+
+        byte[] fileBytes = given()
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept("application/pdf")
+                .body(json)
+                .when().post("/tables")
+                .then()
+                .statusCode(200)
+                .extract().asByteArray();
+
+        assertNotNull(fileBytes);
+        assertTrue(fileBytes.length > 0);
+
+        try (PdfDocument pdfDoc = new PdfDocument(new PdfReader(new ByteArrayInputStream(fileBytes)))) {
+            String text = PdfTextExtractor.getTextFromPage(pdfDoc.getFirstPage());
+
+            assertNotNull(text);
+            assertTrue(text.contains("Electronics"), "PDF should contain row header data.");
+            assertTrue(text.contains("Total"), "PDF should contain the column footer row title.");
+            assertTrue(text.contains("496000"), "PDF should contain the column footer data.");
         }
     }
 

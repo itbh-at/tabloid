@@ -1,0 +1,40 @@
+{
+    "version": "1.0",
+    "document": {
+      "title": "Structural Elements Test",
+      "author": "ITBH Test Suite",
+      "formats": [
+        {
+          "format": "pdf",
+          "size": "A4"
+        }
+      ]
+    },
+    "tables": [
+      {
+        "name": "Q1 Product Sales",
+        "headerColumnCount": 1,
+        "footerRowCount": 1,
+        "columns": [
+          { "name": "Product Category", "type": "string" },
+          { "name": "Units Sold", "type": "number" },
+          { "name": "Revenue", "type": "currency" }
+        ],
+        "rows": [
+          [ "Electronics", 150, 75000 ],
+          [ "Appliances", 80, 42000 ],
+          [ "Furniture", 120, 95000 ],
+          [ "Gardening", 200, 15000 ],
+          [ "Automotive", 95, 38000 ],
+          [ "Toys & Games", 300, 22000 ],
+          [ "Books", 500, 8000 ],
+          [ "Clothing", 450, 29000 ],
+          [ "Jewelry", 25, 55000 ],
+          [ "Sporting Goods", 180, 31000 ],
+          [ "Industrial", 40, 61000 ],
+          [ "Health & Beauty", 600, 25000 ],
+          [ "Total", 2740, 496000 ]
+        ]
+      }
+    ]
+  }

@@ -126,6 +126,33 @@ public class XlsxGenerator {
             return;
         }
 
+        String alignmentCacheKey = styleKey + (column.alignment() != null
+                ? "_" + column.alignment().horizontal() + "_" + column.alignment().vertical()
+                : "");
+
+        CellStyle finalStyle = styleCache.computeIfAbsent(alignmentCacheKey, k -> {
+            CellStyle newStyle = workbook.createCellStyle();
+            newStyle.cloneStyleFrom(styleCache.get(styleKey));
+
+            if (column.alignment() != null) {
+                if (column.alignment().horizontal() != null) {
+                    newStyle.setAlignment(HorizontalAlignment.valueOf(column.alignment().horizontal().toUpperCase()));
+                }
+                if (column.alignment().vertical() != null) {
+                    newStyle.setVerticalAlignment(
+                            VerticalAlignment.valueOf(column.alignment().vertical().toUpperCase()));
+                }
+            } else {
+                if (ColumnType.STRING.equals(column.type())) {
+                    newStyle.setAlignment(HorizontalAlignment.LEFT);
+                } else {
+                    newStyle.setAlignment(HorizontalAlignment.RIGHT);
+                }
+                newStyle.setVerticalAlignment(VerticalAlignment.TOP);
+            }
+            return newStyle;
+        });
+
         switch (column.type()) {
             case ColumnType.NUMBER:
             case ColumnType.CURRENCY:
@@ -136,16 +163,16 @@ public class XlsxGenerator {
                 }
                 String numberFormat = column.format();
                 if (numberFormat != null && !numberFormat.isBlank()) {
-                    String cacheKey = styleKey + "_" + numberFormat;
+                    String cacheKey = alignmentCacheKey + "_" + numberFormat;
                     CellStyle numberStyle = styleCache.computeIfAbsent(cacheKey, k -> {
                         CellStyle newStyle = workbook.createCellStyle();
-                        newStyle.cloneStyleFrom(styleCache.get(styleKey));
+                        newStyle.cloneStyleFrom(finalStyle);
                         newStyle.setDataFormat(workbook.getCreationHelper().createDataFormat().getFormat(numberFormat));
                         return newStyle;
                     });
                     cell.setCellStyle(numberStyle);
                 } else {
-                    cell.setCellStyle(styleCache.get(styleKey));
+                    cell.setCellStyle(finalStyle);
                 }
                 break;
             case ColumnType.DATE:
@@ -153,10 +180,10 @@ public class XlsxGenerator {
                     cell.setCellValue(LocalDate.parse(value.toString()));
                 }
                 String dateFormat = "yyyy-mm-dd";
-                String dateCacheKey = styleKey + "_" + dateFormat;
+                String dateCacheKey = alignmentCacheKey + "_" + dateFormat;
                 CellStyle dateStyle = styleCache.computeIfAbsent(dateCacheKey, k -> {
                     CellStyle newStyle = workbook.createCellStyle();
-                    newStyle.cloneStyleFrom(styleCache.get(styleKey));
+                    newStyle.cloneStyleFrom(finalStyle);
                     newStyle.setDataFormat(workbook.getCreationHelper().createDataFormat().getFormat(dateFormat));
                     return newStyle;
                 });
@@ -168,10 +195,10 @@ public class XlsxGenerator {
                             Date.from(ZonedDateTime.parse(value.toString(), FLEXIBLE_TIMESTAMP_FORMATTER).toInstant()));
                 }
                 String tsFormat = "yyyy-mm-dd hh:mm:ss";
-                String tsCacheKey = styleKey + "_" + tsFormat;
+                String tsCacheKey = alignmentCacheKey + "_" + tsFormat;
                 CellStyle tsStyle = styleCache.computeIfAbsent(tsCacheKey, k -> {
                     CellStyle newStyle = workbook.createCellStyle();
-                    newStyle.cloneStyleFrom(styleCache.get(styleKey));
+                    newStyle.cloneStyleFrom(finalStyle);
                     newStyle.setDataFormat(workbook.getCreationHelper().createDataFormat().getFormat(tsFormat));
                     return newStyle;
                 });
@@ -180,7 +207,7 @@ public class XlsxGenerator {
             case ColumnType.STRING:
             default:
                 cell.setCellValue(value.toString());
-                cell.setCellStyle(styleCache.get(styleKey));
+                cell.setCellStyle(finalStyle);
                 break;
         }
     }

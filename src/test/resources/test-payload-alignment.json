@@ -1,0 +1,21 @@
+{
+    "version": "1.0",
+    "document": {
+      "title": "Alignment Test",
+      "author": "ITBH Test Suite"
+    },
+    "tables": [
+      {
+        "name": "Alignment",
+        "columns": [
+          { "name": "Left", "type": "string", "alignment": {"horizontal": "left", "vertical": "top"} },
+          { "name": "Center", "type": "string", "alignment": {"horizontal": "center", "vertical": "center"} },
+          { "name": "Right", "type": "number", "alignment": {"horizontal": "right", "vertical": "bottom"} }
+        ],
+        "rows": [
+          [ "abc", "def", 123 ],
+          [ "ghi", "jkl", 456 ]
+        ]
+      }
+    ]
+  }

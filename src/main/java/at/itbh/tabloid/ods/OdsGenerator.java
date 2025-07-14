@@ -18,6 +18,7 @@ import org.odftoolkit.odfdom.dom.OdfDocumentNamespace;
 import org.odftoolkit.odfdom.dom.element.style.StyleTextPropertiesElement;
 import org.odftoolkit.odfdom.dom.style.OdfStyleFamily;
 import org.odftoolkit.odfdom.dom.style.props.OdfTableCellProperties;
+import org.odftoolkit.odfdom.dom.style.props.OdfParagraphProperties;
 import org.odftoolkit.odfdom.incubator.doc.office.OdfOfficeAutomaticStyles;
 import org.odftoolkit.odfdom.incubator.doc.style.OdfStyle;
 
@@ -59,7 +60,8 @@ public class OdsGenerator {
             doc.getOfficeMetadata().setTitle(request.document().title());
             doc.getOfficeMetadata().setSubject(request.document().subject());
 
-            createNamedStyles(doc);
+            OdfOfficeAutomaticStyles styles = doc.getContentDom().getOrCreateAutomaticStyles();
+            createNamedStyles(styles);
 
             Optional<OdsFormatOptions> formatOptions = request.getFormatOptions(OdsFormatOptions.class);
             boolean hasHeaderColumn = formatOptions.flatMap(o -> Optional.ofNullable(o.hasHeaderColumn()))
@@ -104,16 +106,32 @@ public class OdsGenerator {
 
                         setCellValue(cell, value, column);
 
-                        String styleName;
+                        String baseStyleName;
                         if (isFooterRow) {
-                            styleName = FOOTER_STYLE_NAME;
+                            baseStyleName = FOOTER_STYLE_NAME;
                         } else if (hasHeaderColumn && colIndex == 0) {
-                            styleName = ROW_HEADER_STYLE_NAME;
+                            baseStyleName = ROW_HEADER_STYLE_NAME;
                         } else {
-                            styleName = DATA_STYLE_NAME;
+                            baseStyleName = DATA_STYLE_NAME;
+                        }
+                        String horizontalAlign;
+                        if (column.alignment() != null && column.alignment().horizontal() != null) {
+                            horizontalAlign = column.alignment().horizontal();
+                        } else {
+                            horizontalAlign = ColumnType.STRING.equals(column.type()) ? "left" : "right";
+                        }
+                        String verticalAlign = (column.alignment() != null && column.alignment().vertical() != null)
+                                ? column.alignment().vertical()
+                                : "top";
+                        String finalStyleName = baseStyleName + "_" + horizontalAlign + "_" + verticalAlign;
+                        if (styles.getStyle(finalStyleName, OdfStyleFamily.TableCell) == null) {
+                            OdfStyle newStyle = styles.newStyle(OdfStyleFamily.TableCell);
+                            newStyle.setStyleNameAttribute(finalStyleName);
+                            newStyle.setStyleParentStyleNameAttribute(baseStyleName);
+                            populateAlignment(newStyle, horizontalAlign, verticalAlign);
                         }
                         cell.getOdfElement().setAttributeNS(OdfDocumentNamespace.TABLE.getUri(), "table:style-name",
-                                styleName);
+                                finalStyleName);
                     }
                 }
             }
@@ -149,9 +167,7 @@ public class OdsGenerator {
         return columnWidths;
     }
 
-    private void createNamedStyles(OdfSpreadsheetDocument doc) throws Exception {
-        OdfOfficeAutomaticStyles styles = doc.getContentDom().getOrCreateAutomaticStyles();
-
+    private void createNamedStyles(OdfOfficeAutomaticStyles styles) {
         OdfStyle headerStyle = styles.newStyle(OdfStyleFamily.TableCell);
         headerStyle.setStyleNameAttribute(HEADER_STYLE_NAME);
         populateStyleProperties(headerStyle, odsConfig.header());
@@ -167,6 +183,17 @@ public class OdsGenerator {
         OdfStyle footerStyle = styles.newStyle(OdfStyleFamily.TableCell);
         footerStyle.setStyleNameAttribute(FOOTER_STYLE_NAME);
         populateStyleProperties(footerStyle, odsConfig.footer());
+    }
+
+    private void populateAlignment(OdfStyle style, String horizontal, String vertical) {
+        String horizontalValue = horizontal;
+        if ("left".equalsIgnoreCase(horizontalValue)) {
+            horizontalValue = "start";
+        } else if ("right".equalsIgnoreCase(horizontalValue)) {
+            horizontalValue = "end";
+        }
+        style.setProperty(OdfParagraphProperties.TextAlign, horizontalValue);
+        style.setProperty(OdfTableCellProperties.VerticalAlign, vertical);
     }
 
     private void populateStyleProperties(OdfStyle style, StyleConfig styleConfig) {
