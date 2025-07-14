@@ -69,13 +69,10 @@ public class OdsGenerator {
                     sheet.setTableName(tableData.name());
                 }
 
-                List<Integer> maxWidths = new ArrayList<>();
-                for (int colIndex = 0; colIndex < tableData.columns().size(); colIndex++) {
-                    maxWidths.add(findMaxColumnWidth(tableData, colIndex));
-                }
-                for (int colIndex = 0; colIndex < tableData.columns().size(); colIndex++) {
+                List<Integer> columnWidths = calculateColumnWidths(tableData);
+                for (int colIndex = 0; colIndex < columnWidths.size(); colIndex++) {
                     OdfTableColumn column = sheet.getColumnByIndex(colIndex);
-                    long width = maxWidths.get(colIndex);
+                    long width = columnWidths.get(colIndex);
                     column.setWidth(width);
                 }
 
@@ -105,22 +102,30 @@ public class OdsGenerator {
         }
     }
 
-    private int findMaxColumnWidth(Table tableData, int colIndex) {
-        String headerName = tableData.columns().get(colIndex).name();
-        int maxLength = (headerName != null) ? headerName.length() : 0;
-
+    private List<Integer> calculateColumnWidths(Table tableData) {
+        List<Column> columns = tableData.columns();
+        int numColumns = columns.size();
+        int[] maxLengths = new int[numColumns];
+        for (int i = 0; i < numColumns; i++) {
+            String headerName = columns.get(i).name();
+            maxLengths[i] = (headerName != null) ? headerName.length() : 0;
+        }
         for (List<Object> rowData : tableData.rows()) {
-            if (colIndex < rowData.size()) {
-                Object cellValue = rowData.get(colIndex);
+            for (int i = 0; i < rowData.size() && i < numColumns; i++) {
+                Object cellValue = rowData.get(i);
                 if (cellValue != null) {
                     int currentLength = cellValue.toString().length();
-                    if (currentLength > maxLength) {
-                        maxLength = currentLength;
+                    if (currentLength > maxLengths[i]) {
+                        maxLengths[i] = currentLength;
                     }
                 }
             }
         }
-        return ColumnWidthHeuristic.calculateWidth(maxLength);
+        List<Integer> columnWidths = new ArrayList<>();
+        for (int maxLength : maxLengths) {
+            columnWidths.add(ColumnWidthHeuristic.calculateWidth(maxLength));
+        }
+        return columnWidths;
     }
 
     private void createNamedStyles(OdfSpreadsheetDocument doc) throws Exception {
