@@ -6,15 +6,16 @@ This guide provides a comprehensive reference for all format-specific options su
 
 ## Table of Contents
 
-- [Overview](#overview)
-- [Request Structure](#request-structure)
-- [Format-Specific Options](#format-specific-options)
-  - [XLSX Options](#xlsx-options)
-  - [ODS Options](#ods-options)
-  - [CSV Options](#csv-options)
-  - [HTML Options](#html-options)
-  - [PDF Options](#pdf-options)
-- [Examples](#examples)
+- [Overview](https://www.google.com/search?q=%23overview)
+- [Request Structure](https://www.google.com/search?q=%23request-structure)
+- [Column Alignment](https://www.google.com/search?q=%23column-alignment)
+- [Format-Specific Options](https://www.google.com/search?q=%23format-specific-options)
+  - [XLSX Options](https://www.google.com/search?q=%23xlsx-options)
+  - [ODS Options](https://www.google.com/search?q=%23ods-options)
+  - [CSV Options](https://www.google.com/search?q=%23csv-options)
+  - [HTML Options](https://www.google.com/search?q=%23html-options)
+  - [PDF Options](https://www.google.com/search?q=%23pdf-options)
+- [Examples](https://www.google.com/search?q=%23examples)
 
 ---
 
@@ -39,9 +40,51 @@ Tabloid accepts a JSON payload describing your document and tables. You can spec
     ]
   },
   "tables": [
-    // ... tables as in the main README ...
+    {
+      "name": "Sheet1",
+      "columns": [
+        { "name": "Name", "type": "string" },
+        {
+          "name": "Age",
+          "type": "number",
+          "alignment": { "horizontal": "right" }
+        },
+        { "name": "Birthday", "type": "date", "format": "yyyy-MM-dd" }
+      ],
+      "rows": [
+        ["Alice", 30, "1993-01-01"],
+        ["Bob", 25, "1998-05-23"],
+        ["Cara", 40, "1983-09-12"]
+      ]
+    }
   ]
 }
+```
+
+---
+
+## Column Alignment
+
+You can specify the horizontal and vertical alignment of content within a column by adding an `alignment` object to a column definition.
+
+| Property     | Type   | Description                                             |
+| ------------ | ------ | ------------------------------------------------------- |
+| `horizontal` | string | Horizontal alignment. Can be `left`, `center`, `right`. |
+| `vertical`   | string | Vertical alignment. Can be `top`, `middle`, `bottom`.   |
+
+### Example
+
+```json
+"columns": [
+  {
+    "name": "Region",
+    "type": "string",
+    "alignment": {
+      "horizontal": "center",
+      "vertical": "middle"
+    }
+  }
+]
 ```
 
 ---
@@ -56,9 +99,8 @@ Set `format: "xlsx"` in the `formats` array. All fields are optional.
 | ------------------ | ------- | ------- | -------------------------------------------- |
 | freezeHeaderRow    | boolean | false   | Freeze the first row (header) in each sheet. |
 | freezeHeaderColumn | boolean | false   | Freeze the first column in each sheet.       |
-| hasHeaderColumn    | boolean | false   | Mark the first column as a header column.    |
-| hasFooterColumn    | boolean | false   | Mark the last column as a footer column.     |
-| hasFooterRow       | boolean | false   | Mark the last row as a footer row.           |
+| hasHeaderColumn    | boolean | false   | Style the first column as a header.          |
+| hasFooterRow       | boolean | false   | Style the last row as a footer.              |
 | tables             | object  | —       | Per-table options (see below).               |
 
 #### Per-Table XLSX Options
@@ -82,13 +124,20 @@ Set per-table options by table name:
 | ------------------ | ------- | ------- | -------------------------------------- |
 | freezeHeaderRow    | boolean | false   | Freeze the first row in this table.    |
 | freezeHeaderColumn | boolean | false   | Freeze the first column in this table. |
-| hasFooterRow       | boolean | false   | Mark the last row as a footer row.     |
+| hasFooterRow       | boolean | false   | Treat the last row as a footer.        |
 
 ---
 
 ### ODS Options
 
-_ODS format currently does not support per-request options via the JSON payload. Styling and behavior are controlled by server configuration._
+Set `format: "ods"` in the `formats` array. All fields are optional.
+
+| Option          | Type    | Default | Description                         |
+| --------------- | ------- | ------- | ----------------------------------- |
+| hasHeaderColumn | boolean | false   | Style the first column as a header. |
+| hasFooterRow    | boolean | false   | Style the last row as a footer.     |
+| hasHeaderRow    | boolean | false   | Style the first row as a header.    |
+| hasFooterColumn | boolean | false   | Style the last column as a footer.  |
 
 ---
 
@@ -114,9 +163,13 @@ Set `format: "csv"` in the `formats` array. All fields are optional.
 
 Set `format: "html"` in the `formats` array.
 
-| Option | Type   | Default               | Description                   |
-| ------ | ------ | --------------------- | ----------------------------- |
-| css    | string | classpath:default.css | Path to CSS file for styling. |
+| Option          | Type    | Default               | Description                         |
+| --------------- | ------- | --------------------- | ----------------------------------- |
+| css             | string  | classpath:default.css | Path to CSS file for styling.       |
+| hasHeaderColumn | boolean | false                 | Style the first column as a header. |
+| hasFooterRow    | boolean | false                 | Style the last row as a footer.     |
+| hasHeaderRow    | boolean | false                 | Style the first row as a header.    |
+| hasFooterColumn | boolean | false                 | Style the last column as a footer.  |
 
 ---
 
@@ -124,10 +177,12 @@ Set `format: "html"` in the `formats` array.
 
 Set `format: "pdf"` in the `formats` array.
 
-| Option  | Type   | Default | Description                   |
-| ------- | ------ | ------- | ----------------------------- |
-| version | number | —       | PDF version (e.g., 1.7).      |
-| size    | string | —       | Page size (e.g., A4, Letter). |
+| Option          | Type    | Default | Description                         |
+| --------------- | ------- | ------- | ----------------------------------- |
+| version         | number  | —       | PDF version (e.g., 1.7).            |
+| size            | string  | —       | Page size (e.g., A4, Letter).       |
+| hasHeaderColumn | boolean | false   | Style the first column as a header. |
+| hasFooterRow    | boolean | false   | Style the last row as a footer.     |
 
 ---
 
@@ -173,4 +228,4 @@ Set `format: "pdf"` in the `formats` array.
 
 ---
 
-For more details on the API and request structure, see the main [README.md](./tabloid/README.md).
+For more details on the API and request structure, see the main [README.md](https://www.google.com/search?q=./README.md).
