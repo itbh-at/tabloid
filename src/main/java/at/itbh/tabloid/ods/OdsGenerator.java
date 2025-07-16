@@ -36,6 +36,7 @@ import java.util.Optional;
 @ApplicationScoped
 public class OdsGenerator {
 
+    private static final String GENERATOR_NAME = "tabloid - Your Table Droid <https://github.com/itbh-at/tabloid/>";
     private static final String HEADER_STYLE_NAME = "HeaderStyle";
     private static final String DATA_STYLE_NAME = "DataStyle";
     private static final String ROW_HEADER_STYLE_NAME = "RowHeaderStyle";
@@ -56,9 +57,11 @@ public class OdsGenerator {
         try (var doc = OdfSpreadsheetDocument.newSpreadsheetDocument();
                 var out = new ByteArrayOutputStream()) {
 
+            doc.getOfficeMetadata().setAutomaticUpdate(false);
             doc.getOfficeMetadata().setCreator(request.document().author());
             doc.getOfficeMetadata().setTitle(request.document().title());
             doc.getOfficeMetadata().setSubject(request.document().subject());
+            doc.getOfficeMetadata().setGenerator(GENERATOR_NAME);
 
             OdfOfficeAutomaticStyles styles = doc.getContentDom().getOrCreateAutomaticStyles();
             createNamedStyles(styles);

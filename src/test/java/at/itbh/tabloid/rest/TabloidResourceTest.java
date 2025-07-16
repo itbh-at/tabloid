@@ -8,6 +8,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import static org.hamcrest.Matchers.containsString;
 import org.junit.jupiter.api.Test;
 import org.odftoolkit.odfdom.doc.OdfSpreadsheetDocument;
+import org.odftoolkit.odfdom.incubator.meta.OdfOfficeMeta;
 import org.odftoolkit.odfdom.doc.table.OdfTable;
 import org.odftoolkit.odfdom.doc.table.OdfTableCell;
 import org.odftoolkit.odfdom.doc.table.OdfTableColumn;
@@ -131,8 +132,10 @@ public class TabloidResourceTest {
         assertTrue(fileBytes.length > 0);
 
         try (var doc = OdfSpreadsheetDocument.loadDocument(new ByteArrayInputStream(fileBytes))) {
-            assertEquals("Q3 2025 Comprehensive Sales Report", doc.getOfficeMetadata().getTitle());
-            assertEquals("ITBH Test Suite", doc.getOfficeMetadata().getCreator());
+            OdfOfficeMeta metadata = doc.getOfficeMetadata();
+            assertEquals("Q3 2025 Comprehensive Sales Report", metadata.getTitle());
+            assertEquals("ITBH Test Suite", metadata.getCreator());
+            assertEquals("tabloid - Your Table Droid <https://github.com/itbh-at/tabloid/>", metadata.getGenerator());
 
             OdfTable sheet = doc.getTableByName("Regional Sales Performance");
             assertNotNull(sheet, "Sheet 'Regional Sales Performance' should exist.");
