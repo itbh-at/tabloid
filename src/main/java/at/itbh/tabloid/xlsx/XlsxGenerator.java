@@ -20,6 +20,7 @@ import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.DateTimeParseException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -176,33 +177,44 @@ public class XlsxGenerator {
                 }
                 break;
             case ColumnType.DATE:
-                if (value != null && !value.toString().isBlank()) {
-                    cell.setCellValue(LocalDate.parse(value.toString()));
+                try {
+                    if (value != null && !value.toString().isBlank()) {
+                        cell.setCellValue(LocalDate.parse(value.toString()));
+                    }
+                    String dateFormat = "yyyy-mm-dd";
+                    String dateCacheKey = alignmentCacheKey + "_" + dateFormat;
+                    CellStyle dateStyle = styleCache.computeIfAbsent(dateCacheKey, k -> {
+                        CellStyle newStyle = workbook.createCellStyle();
+                        newStyle.cloneStyleFrom(finalStyle);
+                        newStyle.setDataFormat(workbook.getCreationHelper().createDataFormat().getFormat(dateFormat));
+                        return newStyle;
+                    });
+                    cell.setCellStyle(dateStyle);
+                } catch (DateTimeParseException e) {
+                    cell.setCellValue(value.toString());
+                    cell.setCellStyle(finalStyle);
                 }
-                String dateFormat = "yyyy-mm-dd";
-                String dateCacheKey = alignmentCacheKey + "_" + dateFormat;
-                CellStyle dateStyle = styleCache.computeIfAbsent(dateCacheKey, k -> {
-                    CellStyle newStyle = workbook.createCellStyle();
-                    newStyle.cloneStyleFrom(finalStyle);
-                    newStyle.setDataFormat(workbook.getCreationHelper().createDataFormat().getFormat(dateFormat));
-                    return newStyle;
-                });
-                cell.setCellStyle(dateStyle);
                 break;
             case ColumnType.TIMESTAMP:
-                if (value != null && !value.toString().isBlank()) {
-                    cell.setCellValue(
-                            Date.from(ZonedDateTime.parse(value.toString(), FLEXIBLE_TIMESTAMP_FORMATTER).toInstant()));
+                try {
+                    if (value != null && !value.toString().isBlank()) {
+                        cell.setCellValue(
+                                Date.from(ZonedDateTime.parse(value.toString(), FLEXIBLE_TIMESTAMP_FORMATTER)
+                                        .toInstant()));
+                    }
+                    String tsFormat = "yyyy-mm-dd hh:mm:ss";
+                    String tsCacheKey = alignmentCacheKey + "_" + tsFormat;
+                    CellStyle tsStyle = styleCache.computeIfAbsent(tsCacheKey, k -> {
+                        CellStyle newStyle = workbook.createCellStyle();
+                        newStyle.cloneStyleFrom(finalStyle);
+                        newStyle.setDataFormat(workbook.getCreationHelper().createDataFormat().getFormat(tsFormat));
+                        return newStyle;
+                    });
+                    cell.setCellStyle(tsStyle);
+                } catch (DateTimeParseException e) {
+                    cell.setCellValue(value.toString());
+                    cell.setCellStyle(finalStyle);
                 }
-                String tsFormat = "yyyy-mm-dd hh:mm:ss";
-                String tsCacheKey = alignmentCacheKey + "_" + tsFormat;
-                CellStyle tsStyle = styleCache.computeIfAbsent(tsCacheKey, k -> {
-                    CellStyle newStyle = workbook.createCellStyle();
-                    newStyle.cloneStyleFrom(finalStyle);
-                    newStyle.setDataFormat(workbook.getCreationHelper().createDataFormat().getFormat(tsFormat));
-                    return newStyle;
-                });
-                cell.setCellStyle(tsStyle);
                 break;
             case ColumnType.STRING:
             default:
