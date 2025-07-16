@@ -3,6 +3,7 @@
     "document": {
       "title": "Custom PDF Report",
       "author": "ITBH Test Suite",
+      "subject": "PDF Options",
       "formats": [
         {
           "format": "pdf",

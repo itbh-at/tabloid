@@ -3,6 +3,7 @@ package at.itbh.tabloid.rest;
 import io.quarkus.test.junit.QuarkusTest;
 import java.util.logging.Logger;
 import jakarta.ws.rs.core.MediaType;
+import org.apache.poi.ooxml.POIXMLProperties;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import static org.hamcrest.Matchers.containsString;
@@ -14,6 +15,7 @@ import org.odftoolkit.odfdom.doc.table.OdfTableCell;
 import org.odftoolkit.odfdom.doc.table.OdfTableColumn;
 
 import com.itextpdf.kernel.pdf.PdfDocument;
+import com.itextpdf.kernel.pdf.PdfDocumentInfo;
 import com.itextpdf.kernel.pdf.PdfReader;
 import com.itextpdf.kernel.pdf.canvas.parser.PdfTextExtractor;
 import com.itextpdf.kernel.pdf.canvas.parser.listener.SimpleTextExtractionStrategy;
@@ -52,6 +54,14 @@ public class TabloidResourceTest {
         assertTrue(fileBytes.length > 0);
 
         try (XSSFWorkbook workbook = new XSSFWorkbook(new ByteArrayInputStream(fileBytes))) {
+            // Verify Metadata
+            POIXMLProperties.CoreProperties coreProps = workbook.getProperties().getCoreProperties();
+            assertEquals("Q3 2025 Comprehensive Sales Report", coreProps.getTitle());
+            assertEquals("ITBH Test Suite", coreProps.getCreator());
+            assertEquals("Sales figures for the third quarter with structural elements",
+                    coreProps.getSubject());
+
+            // Verify Content and Styling
             Sheet sheet1 = workbook.getSheet("Regional Sales Performance");
             assertNotNull(sheet1);
 
@@ -135,6 +145,7 @@ public class TabloidResourceTest {
             OdfOfficeMeta metadata = doc.getOfficeMetadata();
             assertEquals("Q3 2025 Comprehensive Sales Report", metadata.getTitle());
             assertEquals("ITBH Test Suite", metadata.getCreator());
+            assertEquals("Sales figures for the third quarter with structural elements", metadata.getSubject());
             assertEquals("tabloid - Your Table Droid <https://github.com/itbh-at/tabloid/>", metadata.getGenerator());
 
             OdfTable sheet = doc.getTableByName("Regional Sales Performance");
@@ -328,6 +339,14 @@ public class TabloidResourceTest {
 
         try (PdfDocument pdfDoc = new PdfDocument(
                 new PdfReader(new ByteArrayInputStream(fileBytes)))) {
+
+            // Verify Metadata
+            PdfDocumentInfo info = pdfDoc.getDocumentInfo();
+            assertEquals("Custom PDF Report", info.getTitle());
+            assertEquals("ITBH Test Suite", info.getAuthor());
+            assertEquals("PDF Options", info.getSubject());
+            assertEquals("tabloid - Your Table Droid <https://github.com/itbh-at/tabloid/>", info.getProducer());
+
             assertEquals("PDF-1.7", pdfDoc.getPdfVersion().toString(), "The PDF version should match the request.");
             StringBuilder text = new StringBuilder();
             int numberOfPages = pdfDoc.getNumberOfPages();
