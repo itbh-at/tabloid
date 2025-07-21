@@ -1,0 +1,56 @@
+<section>
+    <h2>{table.name}</h2>
+    <table>
+        <thead>
+            <tr>
+                {#for column in table.columns}
+                    <th scope="col">{column.name}</th>
+                {/for}
+            </tr>
+        </thead>
+        <tbody>
+            {#if hasFooterRow}
+              {#for row in table.rows.subList(0, table.rows.size() - 1)}
+                <tr>
+                    {#for cell in row}
+                        {#let alignment=table.columns.get(cell_index).alignment}
+                        {#if cell_index == 0 && hasHeaderColumn}
+                        <th scope="row" style="text-align:{#if alignment && alignment.horizontal}{alignment.horizontal}{#else if table.columns.get(cell_index).type == 'string'}left#{#else}right{/if}; vertical-align:{#if alignment && alignment.vertical}{alignment.vertical}{#else}top{/if};">{cell.toString}</th>
+                        {#else}
+                        <td style="text-align:{#if alignment && alignment.horizontal}{alignment.horizontal}{#else if table.columns.get(cell_index).type == 'string'}left#{#else}right{/if}; vertical-align:{#if alignment && alignment.vertical}{alignment.vertical}{#else}top{/if};">{#if cell}{cell.toString}{/if}</td>
+                        {/if}
+                    {/for}
+                </tr>
+              {/for}
+            {#else}
+              {#for row in table.rows}
+                <tr>
+                    {#for cell in row}
+                        {#let alignment=table.columns.get(cell_index).alignment}
+                        {#if cell_index == 0 && hasHeaderColumn}
+                        <th scope="row" style="text-align:{#if alignment && alignment.horizontal}{alignment.horizontal}{#else if table.columns.get(cell_index).type == 'string'}left#{#else}right{/if}; vertical-align:{#if alignment && alignment.vertical}{alignment.vertical}{#else}top{/if};">{cell.toString}</th>
+                        {#else}
+                        <td style="text-align:{#if alignment && alignment.horizontal}{alignment.horizontal}{#else if table.columns.get(cell_index).type == 'string'}left#{#else}right{/if}; vertical-align:{#if alignment && alignment.vertical}{alignment.vertical}{#else}top{/if};">{#if cell}{cell.toString}{/if}</td>
+                        {/if}
+                    {/for}
+                </tr>
+              {/for}
+            {/if}
+        </tbody>
+        {#if hasFooterRow}
+        <tfoot>
+            {#let footerRow = table.rows.get(table.rows.size() - 1)}
+            <tr>
+                {#for cell in footerRow}
+                    {#let alignment=table.columns.get(cell_index).alignment}
+                    {#if cell_index == 0 && hasHeaderColumn}
+                    <th scope="row" style="text-align:{#if alignment && alignment.horizontal}{alignment.horizontal}{#else if table.columns.get(cell_index).type == 'string'}left#{#else}right{/if}; vertical-align:{#if alignment && alignment.vertical}{alignment.vertical}{#else}top{/if};">{cell.toString}</th>
+                    {#else}
+                    <td style="text-align:{#if alignment && alignment.horizontal}{alignment.horizontal}{#else if table.columns.get(cell_index).type == 'string'}left#{#else}right{/if}; vertical-align:{#if alignment && alignment.vertical}{alignment.vertical}{#else}top{/if};">{#if cell}{cell.toString}{/if}</td>
+                    {/if}
+                {/for}
+            </tr>
+        </tfoot>
+        {/if}
+    </table>
+</section>

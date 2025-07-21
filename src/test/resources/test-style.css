@@ -1,0 +1,30 @@
+@font-face {
+    font-family: 'Roboto';
+    src: url('/fonts/Roboto.ttf') 
+}
+
+body {
+    font-family: 'Roboto';
+    background-color: #f0f0f0;
+}
+
+h1 {
+    color: green;
+    text-decoration: underline;
+}
+
+table {
+    border: 5px dashed blue;
+}
+
+th {
+    background-color: orange;
+    color: white;
+}
+
+@media print {
+    tr {
+      page-break-inside: avoid;
+      break-inside: avoid; 
+    }
+  }

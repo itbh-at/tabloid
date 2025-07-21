@@ -1,0 +1,57 @@
+@font-face {
+    font-family: 'Roboto';
+    src: url('/fonts/Roboto.ttf') 
+}
+
+body {
+    font-family: 'Roboto';
+    line-height: 1.5;
+    margin: 2em;
+}
+
+h1, h2 {
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 0.25em;
+    margin-bottom: 0.5em;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: 1em;
+    table-layout: fixed; 
+}
+
+thead {
+    background-color: #f2f2f2;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+    word-wrap: break-word; 
+}
+
+th {
+    font-weight: bold;
+}
+
+@media print {
+    tr {
+      page-break-inside: avoid;
+      break-inside: avoid; 
+    }
+  }
+
+/* Style the first column as a "Row Header" */
+tbody tr td:first-child {
+    font-weight: bold;
+}
+
+/* Style the last row as a "Column Footer" */
+tfoot tr {
+    font-weight: bold;
+    background-color: #f2f2f2; 
+    border-top: 2px solid #ccc; 
+}

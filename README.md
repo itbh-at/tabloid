@@ -1,8 +1,8 @@
 # 📄 tabloid - YOUR TABLE DROID
 
-**tabloid** is a standalone RESTful microservice for transforming structured JSON data into multiple file formats — including *XLSX, ODS, CSV, HTML, and PDF/UA*.
+**tabloid** is a standalone RESTful microservice for transforming structured JSON data into multiple file formats — including _XLSX, ODS, CSV, HTML, and PDF/UA_.
 
-<img src="tabloid.png" style="width: 150px"> 
+<img src="tabloid.png" style="width: 150px">
 
 Built with **Java** and **Quarkus**, **tabloid** is designed for simplicity, making it ideal for generating human- and machine-readable reports from structured data.
 
@@ -19,6 +19,8 @@ Built with **Java** and **Quarkus**, **tabloid** is designed for simplicity, mak
 - 🧱 Built on **Quarkus**, with support from industry-standard libraries.
 
 ## 📬 API Usage
+
+**Looking for advanced options? See the [API Guide](./API_GUIDE.md) for all format-specific settings!**
 
 ### Endpoint
 
@@ -38,7 +40,6 @@ Content-Type: application/json
 Accept: [desired MIME type]
 ```
 
-
 ### Request Body (Example)
 
 ```json
@@ -47,14 +48,14 @@ Accept: [desired MIME type]
     {
       "name": "Sheet1",
       "columns": [
-        { "name": "Name",     "type": "string" },
-        { "name": "Age",      "type": "number" },
+        { "name": "Name", "type": "string" },
+        { "name": "Age", "type": "number" },
         { "name": "Birthday", "type": "date", "format": "yyyy-MM-dd" }
       ],
       "rows": [
         ["Alice", 30, "1993-01-01"],
-        ["Bob",   25, "1998-05-23"],
-        ["Cara",  40, "1983-09-12"]
+        ["Bob", 25, "1998-05-23"],
+        ["Cara", 40, "1983-09-12"]
       ]
     }
   ]
@@ -67,14 +68,14 @@ The response will be an octet stream in the format specified by the `Accept` req
 
 ## 🛠️ Tech Stack
 
-| Purpose              | Tool/Library                            |
-|-|-|
-| Framework            | [Quarkus](https://quarkus.io)            |
-| XLSX Generation      | [Apache POI (Quarkus extension)](https://quarkus.io/extensions/io.quarkiverse.poi/quarkus-poi/) |
-| ODS Generation       | [ODF Toolkit](https://odftoolkit.org/)   |
-| CSV Generation       | [Jackson CSV](https://github.com/FasterXML/jackson-dataformats-text) |
-| HTML Rendering       | [Quarkus Qute](https://quarkus.io/guides/qute) |
-| PDF Generation       | [openhtmltopdf](https://github.com/openhtmltopdf/openhtmltopdf) |
+| Purpose         | Tool/Library                                                                                    |
+| --------------- | ----------------------------------------------------------------------------------------------- |
+| Framework       | [Quarkus](https://quarkus.io)                                                                   |
+| XLSX Generation | [Apache POI (Quarkus extension)](https://quarkus.io/extensions/io.quarkiverse.poi/quarkus-poi/) |
+| ODS Generation  | [ODF Toolkit](https://odftoolkit.org/)                                                          |
+| CSV Generation  | [Jackson CSV](https://github.com/FasterXML/jackson-dataformats-text)                            |
+| HTML Rendering  | [Quarkus Qute](https://quarkus.io/guides/qute)                                                  |
+| PDF Generation  | [openhtmltopdf](https://github.com/openhtmltopdf/openhtmltopdf)                                 |
 
 ## 🧪 Development Status
 

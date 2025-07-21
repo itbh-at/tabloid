@@ -1,0 +1,77 @@
+{
+  "version": "1.0",
+  "document": {
+    "title": "Q3 2025 Comprehensive Sales Report",
+    "author": "ITBH Test Suite",
+    "subject": "Sales figures for the third quarter with structural elements",
+    "formats": [
+      {
+        "format": "xlsx",
+        "hasHeaderColumn": true,
+        "hasFooterRow": true,
+        "freezeHeaderRow": true,
+        "freezeHeaderColumn": true
+      },
+      {
+        "format": "ods",
+        "hasHeaderColumn": true,
+        "hasFooterRow": true
+      },
+      {
+        "format": "html",
+        "hasHeaderColumn": true,
+        "hasFooterRow": true
+      }
+    ]
+  },
+  "tables": [
+    {
+      "name": "Regional Sales Performance",
+      "columns": [
+        {
+          "name": "Region",
+          "type": "string",
+          "alignment": {
+            "horizontal": "center",
+            "vertical": "center"
+          }
+        },
+        {
+          "name": "Units Sold",
+          "type": "number",
+          "format": "#,##0",
+           "alignment": {
+            "horizontal": "left"
+          }
+        },
+        {
+          "name": "Total Revenue",
+          "type": "currency",
+          "symbol": "€",
+          "format": "€ #,##0.00",
+           "alignment": {
+            "horizontal": "center",
+            "vertical": "bottom"
+          }
+        },
+        {
+          "name": "Last Sale Date",
+          "type": "date"
+        }
+      ],
+      "rows": [
+        ["North", 5430, 123456.78, "2025-09-30"],
+        ["East", 4890, 99870.50, "2025-09-28"],
+        ["South", 6120, 145987.10, "2025-09-30"],
+        ["West", 3570, 85640.00, "2025-09-29"],
+        ["Central", 4200, 91200.00, "2025-09-27"],
+        ["Northeast", 2800, 65000.00, "2025-09-25"],
+        ["Southwest", 3900, 89500.00, "2025-09-29"],
+        ["Midwest", 5100, 115000.00, "2025-09-30"],
+        ["Pacific", 7200, 165000.00, "2025-09-28"],
+        ["Mountain", 3300, 78500.00, "2025-09-26"],
+        ["Total", 46510, 1059154.38, ""]
+      ]
+    }
+  ]
+}
