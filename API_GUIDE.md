@@ -2,22 +2,18 @@
 
 This guide provides a comprehensive reference for all format-specific options supported by the Tabloid API. Use these options in your JSON payload to customize the output for XLSX, ODS, CSV, HTML, and PDF formats.
 
----
-
 ## Table of Contents
 
-- [Overview](https://www.google.com/search?q=%23overview)
-- [Request Structure](https://www.google.com/search?q=%23request-structure)
-- [Column Alignment](https://www.google.com/search?q=%23column-alignment)
-- [Format-Specific Options](https://www.google.com/search?q=%23format-specific-options)
-  - [XLSX Options](https://www.google.com/search?q=%23xlsx-options)
-  - [ODS Options](https://www.google.com/search?q=%23ods-options)
-  - [CSV Options](https://www.google.com/search?q=%23csv-options)
-  - [HTML Options](https://www.google.com/search?q=%23html-options)
-  - [PDF Options](https://www.google.com/search?q=%23pdf-options)
-- [Examples](https://www.google.com/search?q=%23examples)
-
----
+- [Overview](#overview)
+- [Request Structure](#request-structure)
+- [Column Alignment](#column-alignment)
+- [Format-Specific Options](#format-specific-options)
+  - [XLSX Options](#xlsx-options)
+  - [ODS Options](#ods-options)
+  - [CSV Options](#csv-options)
+  - [HTML Options](#html-options)
+  - [PDF Options](#pdf-options)
+- [Examples](#examples)
 
 ## Overview
 
@@ -61,8 +57,6 @@ Tabloid accepts a JSON payload describing your document and tables. You can spec
 }
 ```
 
----
-
 ## Column Alignment
 
 You can specify the horizontal and vertical alignment of content within a column by adding an `alignment` object to a column definition.
@@ -86,8 +80,6 @@ You can specify the horizontal and vertical alignment of content within a column
   }
 ]
 ```
-
----
 
 ## Format-Specific Options
 
@@ -126,8 +118,6 @@ Set per-table options by table name:
 | freezeHeaderColumn | boolean | false   | Freeze the first column in this table. |
 | hasFooterRow       | boolean | false   | Treat the last row as a footer.        |
 
----
-
 ### ODS Options
 
 Set `format: "ods"` in the `formats` array. All fields are optional.
@@ -138,8 +128,6 @@ Set `format: "ods"` in the `formats` array. All fields are optional.
 | hasFooterRow    | boolean | false   | Style the last row as a footer.     |
 | hasHeaderRow    | boolean | false   | Style the first row as a header.    |
 | hasFooterColumn | boolean | false   | Style the last column as a footer.  |
-
----
 
 ### CSV Options
 
@@ -157,8 +145,6 @@ Set `format: "csv"` in the `formats` array. All fields are optional.
 | trimValues                       | boolean | true    | Trim whitespace from values.     |
 | includeHeader                    | boolean | true    | Include header row.              |
 
----
-
 ### HTML Options
 
 Set `format: "html"` in the `formats` array.
@@ -171,8 +157,6 @@ Set `format: "html"` in the `formats` array.
 | hasHeaderRow    | boolean | false                 | Style the first row as a header.    |
 | hasFooterColumn | boolean | false                 | Style the last column as a footer.  |
 
----
-
 ### PDF Options
 
 Set `format: "pdf"` in the `formats` array.
@@ -183,8 +167,6 @@ Set `format: "pdf"` in the `formats` array.
 | size            | string  | —       | Page size (e.g., A4, Letter).       |
 | hasHeaderColumn | boolean | false   | Style the first column as a header. |
 | hasFooterRow    | boolean | false   | Style the last row as a footer.     |
-
----
 
 ## Examples
 
@@ -226,6 +208,4 @@ Set `format: "pdf"` in the `formats` array.
 }
 ```
 
----
-
-For more details on the API and request structure, see the main [README.md](https://www.google.com/search?q=./README.md).
+For more details on the API and request structure, see the main [README.md](./README.md).
